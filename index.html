@@ -1382,72 +1382,7 @@ let currentSongName = null;
 
 const STYLES = ['polaroid','vhs','neon','gold','watercolor'];
 
-const SAMPLE_CARDS = [
-  {
-    type: 'intro',
-    person: 'Everyone',
-    tagline: '"To the one who makes every room brighter..."',
-    bg: 'linear-gradient(135deg, #1a0a0f 0%, #2d1520 100%)'
-  },
-  {
-    type: 'photo',
-    style: 'gold',
-    image: 'assets/r1.jpeg',
-    bg: 'linear-gradient(135deg, #fde99a22 0%, #f0c06044 100%)',
-    person: 'From Mum',
-    caption: 'My forever girl 💛',
-    color: '#fff8e0'
-  },
-  {
-    type: 'intro',
-    person: 'Sarah & Jake',
-    tagline: '"Featuring memories from your favourite chaos duo..."',
-    bg: 'linear-gradient(135deg, #1a0a0f 0%, #4a1030 100%)'
-  },
-  {
-    type: 'photo',
-    style: 'neon',
-    image: 'assets/r2.jpeg',
-    bg: 'linear-gradient(135deg, #be185d22 0%, #c084fc44 100%)',
-    person: 'From Sarah',
-    caption: 'Best birthday twins ever 💜',
-    color: '#fce7f3'
-  },
-  {
-    type: 'photo',
-    style: 'vhs',
-    image: 'assets/video.mp4',
-    isVideo: true,
-    bg: 'linear-gradient(135deg, #00220d 0%, #003311 100%)',
-    person: 'From Jake',
-    caption: 'The legendary night... 🤣',
-    color: '#d1fae5'
-  },
-  {
-    type: 'intro',
-    person: 'The Work Crew',
-    tagline: '"A tribute from those who share your Monday mornings..."',
-    bg: 'linear-gradient(135deg, #0a0a1a 0%, #1a1a3a 100%)'
-  },
-  {
-    type: 'photo',
-    style: 'watercolor',
-    image: 'assets/r6.jpeg',
-    bg: 'linear-gradient(135deg, #f97316 22%, #fde68a44 100%)',
-    person: 'From The Office',
-    caption: 'Who keeps our team sane? YOU do 🧡',
-    color: '#fff7ed'
-  },
-  {
-    type: 'photo',
-    style: 'polaroid',
-    image: 'assets/r7.jpeg',
-    bg: 'linear-gradient(135deg, #0ea5e922 0%, #7dd3fc44 100%)',
-    person: 'From Lily',
-    caption: 'This summer was everything 🌊',
-    color: '#e0f2fe'
-  }
-];
+let SAMPLE_CARDS = [];
 
 // ═══════════════════════════════════════
 //  INIT
@@ -1470,9 +1405,20 @@ window.onload = () => {
   db.ref("config/site").on('value', snap => {
     if(snap.exists()) {
       const data = snap.val();
-      if(data.title) document.querySelector('.main-title').textContent = data.title;
+      if(data.mainTitle || data.title) document.querySelector('.main-title').textContent = data.mainTitle || data.title;
+      if(data.preTitle) document.querySelector('.pre-title').textContent = data.preTitle;
+      if(data.subTitle) document.querySelector('.subtitle').textContent = data.subTitle;
+      if(data.nav) document.querySelector('.nav-logo').childNodes[0].textContent = data.nav + " ";
       if(data.color) document.documentElement.style.setProperty('--gold', data.color);
     }
+  });
+
+  db.ref("gallery").on('value', snap => {
+    SAMPLE_CARDS = [];
+    snap.forEach(child => {
+      SAMPLE_CARDS.push(child.val());
+    });
+    renderGallery();
   });
 
   if (isRitaMode) {
@@ -1554,29 +1500,28 @@ function renderGallery() {
 
     if (card.type === 'intro') {
       el.innerHTML = `
-        <div class="card-inner" style="background:${card.bg}">
+        <div class="card-inner" style="background:${card.bg || '#222'}">
           <div class="intro-card-bg"></div>
           <div class="intro-card-content">
             <div class="intro-label">✦ featuring ✦</div>
-            <div class="intro-person">${card.person}</div>
+            <div class="intro-person">${card.person || 'Everyone'}</div>
             <div class="intro-divider"></div>
-            <div class="intro-tagline">${card.tagline}</div>
+            <div class="intro-tagline">${card.tagline || ''}</div>
           </div>
         </div>
       `;
     } else {
       el.innerHTML = `
-        <div class="card-inner" style="background:${card.bg}">
+        <div class="card-inner" style="background:${card.bg || '#111'}">
           ${card.isVideo
             ? `<video src="${card.image}" class="card-photo" loop playsinline></video>`
             : card.image 
               ? `<img src="${card.image}" class="card-photo" alt="Memory" />` 
-              : `<div class="card-photo-placeholder" style="background:${card.bg}; color:${card.color || '#fff'}; font-size:5rem">${card.emoji}</div>`
+              : `<div class="card-photo-placeholder" style="background:${card.bg || '#333'}; color:${card.color || '#fff'}; font-size:5rem">${card.emoji || '✨'}</div>`
           }
           <div class="card-overlay">
-            <div class="card-intro-tag">memory from</div>
-            <div class="card-name">${card.person}</div>
-            <div class="card-caption">${card.caption}</div>
+            ${card.person ? `<div class="card-intro-tag">memory</div><div class="card-name">${card.person}</div>` : ''}
+            <div class="card-caption">${card.text || card.caption || ''}</div>
           </div>
         </div>
       `;
