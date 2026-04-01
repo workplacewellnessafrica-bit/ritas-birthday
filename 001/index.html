@@ -147,7 +147,12 @@
           </div>
         `;
       });
-      document.getElementById("gallery-list").innerHTML = html || "<p>Gallery is empty.</p>";
+      document.getElementById("gallery-list").innerHTML = html || `
+        <p>Gallery is empty. No memories have been created yet.</p>
+        <button onclick="seedDefaults()" style="background:var(--rose); color:#fff; border:none; padding:10px; border-radius:5px; cursor:pointer;">
+          Auto-Import Original 7 Pictures
+        </button>
+      `;
     });
 
     // --- FUNCTIONS ---
@@ -169,6 +174,21 @@
     }
 
     // GALLERY FUNCTIONS
+    window.seedDefaults = function() {
+      const defaults = [
+        { image: 'assets/r1.jpeg', text: 'My forever girl 💛', isVideo: false },
+        { image: 'assets/r2.jpeg', text: 'Best birthday twins ever 💜', isVideo: false },
+        { image: 'assets/r3.jpeg', text: 'To the one who makes every room brighter...', isVideo: false },
+        { image: 'assets/r5.jpeg', text: 'A special soul...', isVideo: false },
+        { image: 'assets/r6.jpeg', text: 'Who keeps our team sane? YOU do 🧡', isVideo: false },
+        { image: 'assets/r7.jpeg', text: 'This summer was everything 🌊', isVideo: false },
+        { image: 'assets/video.mp4', text: 'The legendary night... 🤣', isVideo: true }
+      ];
+      Promise.all(defaults.map(d => db.ref("gallery").push({ 
+        image: d.image, text: d.text, isVideo: d.isVideo, color: "#f0c060", timestamp: Date.now() 
+      }))).then(() => alert("Import sequence complete!"));
+    }
+
     window.updateCaption = function(id) {
       const newText = document.getElementById("cap-" + id).value;
       db.ref("gallery/" + id).update({ text: newText }).then(() => alert("Caption Updated!"));
