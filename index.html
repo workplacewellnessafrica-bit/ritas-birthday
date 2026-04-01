@@ -21,14 +21,24 @@
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
-  html { scroll-behavior: smooth; }
+  html {
+    scroll-behavior: smooth;
+    height: auto;
+    min-height: 100%;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
 
   body {
     font-family: 'DM Sans', sans-serif;
     background: var(--dark);
     color: var(--white);
     overflow-x: hidden;
+    overflow-y: auto;
+    min-height: 100vh;
     cursor: default;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
   }
 
   /* ── CONFETTI CANVAS ── */
@@ -90,12 +100,14 @@
   /* ── LANDING ── */
   #landing {
     min-height: 100vh;
+    min-height: 100dvh;
     display: flex; flex-direction: column;
     align-items: center; justify-content: center;
     position: relative;
     overflow: hidden;
     text-align: center;
     padding: 100px 20px 60px;
+    touch-action: pan-y;
   }
 
   .landing-bg {
@@ -382,6 +394,155 @@
 
   .theme-watercolor .card-inner {
     filter: saturate(1.4) contrast(0.9);
+  }
+
+  /* ── FLOWER ENGULFING STYLE ── */
+  .theme-flower .card-inner {
+    border: 3px solid transparent;
+    background-clip: padding-box;
+    position: relative;
+    overflow: visible;
+  }
+  .theme-flower .card-inner::before {
+    content: '🌸🌺🌼🌷🌻';
+    position: absolute;
+    bottom: -10px; left: 0; right: 0;
+    text-align: center;
+    font-size: 1.8rem;
+    letter-spacing: 8px;
+    filter: drop-shadow(0 4px 8px rgba(244,114,182,0.4));
+    z-index: 10;
+    animation: flowerSway 3s ease-in-out infinite;
+  }
+  .theme-flower .card-inner::after {
+    content: '🌿🍃🌸🍃🌿';
+    position: absolute;
+    top: -10px; left: 0; right: 0;
+    text-align: center;
+    font-size: 1.4rem;
+    letter-spacing: 6px;
+    filter: drop-shadow(0 -2px 6px rgba(192,132,252,0.3));
+    z-index: 10;
+    animation: flowerSway 4s 1s ease-in-out infinite;
+  }
+  .theme-flower .card-photo { border-radius: 20px; }
+  @keyframes flowerSway {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-3px) rotate(1deg); }
+  }
+
+  /* ── SIDE CAPTION STYLE ── */
+  .theme-sidecap .card-inner {
+    display: grid;
+    grid-template-columns: 55% 45%;
+    height: 420px;
+    border-radius: 16px;
+    overflow: hidden;
+  }
+  .theme-sidecap .card-photo {
+    height: 100%; object-fit: cover;
+  }
+  .theme-sidecap .card-overlay {
+    position: relative;
+    inset: unset;
+    background: linear-gradient(135deg, rgba(45,21,32,0.95), rgba(26,10,15,0.98));
+    padding: 24px 16px;
+    display: flex; flex-direction: column;
+    justify-content: center; align-items: flex-start;
+    gap: 8px;
+  }
+
+  /* ── FILMSTRIP STYLE ── */
+  .theme-filmstrip .card-inner {
+    border-top: 18px solid #111;
+    border-bottom: 18px solid #111;
+    background-image:
+      repeating-linear-gradient(90deg, transparent 0px, transparent 14px, #333 14px, #333 16px, transparent 16px, transparent 30px);
+    background-position: top, bottom;
+    background-size: 100% 18px;
+    background-repeat: no-repeat;
+    position: relative;
+  }
+  .theme-filmstrip .card-photo {
+    filter: contrast(1.1) saturate(0.85);
+  }
+  .theme-filmstrip::after {
+    content: 'KODAK 400  ▸▸  35mm';
+    position: absolute; bottom: 22px; right: 12px;
+    font-family: monospace; font-size: 0.55rem;
+    color: rgba(255,180,50,0.6);
+    letter-spacing: 2px; z-index: 5;
+  }
+
+  /* ── UPLOADER PROFILE TAG ── */
+  .uploader-tag {
+    display: flex; align-items: center; gap: 8px;
+    padding: 8px 12px;
+    background: rgba(0,0,0,0.5);
+    backdrop-filter: blur(8px);
+    border-radius: 0 0 20px 20px;
+    border-top: 1px solid rgba(255,255,255,0.06);
+  }
+  .uploader-avatar {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--gold), var(--rose));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.7rem; font-weight: 700;
+    color: var(--dark); flex-shrink: 0;
+    overflow: hidden;
+  }
+  .uploader-avatar img {
+    width: 100%; height: 100%; object-fit: cover; border-radius: 50%;
+  }
+  .uploader-info { display: flex; flex-direction: column; }
+  .uploader-name {
+    font-size: 0.72rem; font-weight: 500;
+    color: rgba(255,255,255,0.85);
+    letter-spacing: 0.5px;
+  }
+  .uploader-role {
+    font-size: 0.6rem;
+    color: rgba(255,255,255,0.35);
+    letter-spacing: 1px;
+  }
+
+  /* ── LIVE PREVIEW BOX ── */
+  .preview-box {
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 16px;
+    overflow: hidden;
+    margin-bottom: 20px;
+    background: rgba(0,0,0,0.3);
+    transition: all 0.4s;
+  }
+  .preview-inner {
+    width: 100%; height: 200px;
+    position: relative;
+    display: flex; align-items: flex-end;
+    overflow: hidden;
+  }
+  .preview-placeholder {
+    width: 100%; height: 100%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 3rem;
+    background: linear-gradient(135deg, #2d1520, #1a0a0f);
+  }
+  .preview-img {
+    width: 100%; height: 100%; object-fit: cover;
+  }
+  .preview-overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(180deg, transparent 40%, rgba(0,0,0,0.8) 100%);
+    display: flex; flex-direction: column; justify-content: flex-end;
+    padding: 14px;
+  }
+  .preview-caption {
+    font-size: 0.8rem; color: rgba(255,255,255,0.6);
+  }
+  .preview-label {
+    font-size: 0.6rem; letter-spacing: 2px; text-transform: uppercase;
+    color: var(--gold-light); margin-bottom: 2px;
   }
 
   .card-photo {
@@ -1226,15 +1387,33 @@
 
 <!-- UPLOAD MODAL -->
 <div class="modal-overlay" id="upload-modal">
-  <div class="modal">
+  <div class="modal" style="max-width:560px">
     <button class="modal-close" onclick="closeModal('upload-modal')">×</button>
     <div class="modal-icon">📸</div>
     <div class="modal-title">Add Your Memory</div>
-    <div class="modal-subtitle">Your photos & videos will appear as a cinematic intro in the gallery — like a movie credit for your friendship with Rita</div>
+    <div class="modal-subtitle">Your photos &amp; videos will appear as a cinematic card in the gallery</div>
+
+    <!-- LIVE PREVIEW -->
+    <div class="preview-box" id="preview-box">
+      <div class="preview-inner" id="preview-inner">
+        <div class="preview-placeholder" id="preview-placeholder">📷</div>
+        <div class="preview-overlay" id="preview-overlay" style="display:none">
+          <div class="preview-label">memory</div>
+          <div class="preview-caption" id="preview-caption-text">Your caption here...</div>
+        </div>
+      </div>
+      <div class="uploader-tag" id="preview-tag">
+        <div class="uploader-avatar" id="preview-avatar">?</div>
+        <div class="uploader-info">
+          <div class="uploader-name" id="preview-name">Your Name</div>
+          <div class="uploader-role">uploaded this memory</div>
+        </div>
+      </div>
+    </div>
 
     <div class="upload-zone" id="upload-zone" onclick="document.getElementById('file-input').click()">
       <div class="upload-icon">🖼️</div>
-      <p>Drag & drop photos or videos<br><span>or click to browse</span></p>
+      <p>Drag &amp; drop photos or videos<br><span>or click to browse</span></p>
       <input type="file" id="file-input" multiple accept="image/*,video/*" style="display:none" onchange="handleFileUpload(event)">
     </div>
 
@@ -1248,18 +1427,18 @@
     </div>
 
     <div class="form-group">
-      <label class="form-label">Your Name (optional)</label>
-      <input type="text" class="form-input" id="uploader-name" placeholder="e.g. Sarah or Anonymous">
+      <label class="form-label">Your Name (required)</label>
+      <input type="text" class="form-input" id="uploader-name" placeholder="e.g. Sarah or Anonymous" oninput="updatePreview()" required>
     </div>
 
     <div class="form-group">
       <label class="form-label">Caption for Rita</label>
-      <textarea class="form-textarea" id="uploader-caption" placeholder="Happy birthday Rita! Remember when we..."></textarea>
+      <textarea class="form-textarea" id="uploader-caption" placeholder="Happy birthday Rita! Remember when we..." oninput="updatePreview()"></textarea>
     </div>
 
     <div class="form-group">
       <label class="form-label">Choose your style</label>
-      <div class="style-picker">
+      <div class="style-picker" style="grid-template-columns: repeat(4, 1fr)">
         <div class="style-chip selected" onclick="selectStyle(this, 'polaroid')">
           <span class="style-icon">📷</span>Polaroid
         </div>
@@ -1274,6 +1453,12 @@
         </div>
         <div class="style-chip" onclick="selectStyle(this, 'watercolor')">
           <span class="style-icon">🎨</span>Watercolor
+        </div>
+        <div class="style-chip" onclick="selectStyle(this, 'flower')">
+          <span class="style-icon">🌸</span>Flower
+        </div>
+        <div class="style-chip" onclick="selectStyle(this, 'sidecap')">
+          <span class="style-icon">📝</span>Side Cap
         </div>
         <div class="style-chip" onclick="selectStyle(this, 'random')">
           <span class="style-icon">🎲</span>Surprise
@@ -1380,9 +1565,15 @@ let songProgress = 0;
 let songInterval = null;
 let currentSongName = null;
 
-const STYLES = ['polaroid','vhs','neon','gold','watercolor'];
+const STYLES = ['polaroid','vhs','neon','gold','watercolor','flower','sidecap','filmstrip'];
 
 let SAMPLE_CARDS = [];
+let uploadFiles = []; // Track files selected in upload modal
+
+// Backend URL — update to your Railway deployment URL in production
+const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+  ? '' // same origin when served by backend locally
+  : ''; // Update this to your Railway URL e.g. 'https://your-app.up.railway.app'
 
 // ═══════════════════════════════════════
 //  INIT
@@ -1526,6 +1717,13 @@ function renderGallery() {
             <div class="intro-tagline">${card.tagline || ''}</div>
           </div>
         </div>
+        <div class="uploader-tag">
+          <div class="uploader-avatar">${(card.uploader || 'A Friend')[0].toUpperCase()}</div>
+          <div class="uploader-info">
+            <div class="uploader-name">${card.uploader || 'A Friend'}</div>
+            <div class="uploader-role">uploaded this memory</div>
+          </div>
+        </div>
       `;
     } else {
       el.innerHTML = `
@@ -1539,6 +1737,13 @@ function renderGallery() {
           <div class="card-overlay">
             ${card.person ? `<div class="card-intro-tag">memory</div><div class="card-name">${card.person}</div>` : ''}
             <div class="card-caption">${card.text || card.caption || ''}</div>
+          </div>
+        </div>
+        <div class="uploader-tag">
+          <div class="uploader-avatar">${(card.uploader || 'A Friend')[0].toUpperCase()}</div>
+          <div class="uploader-info">
+            <div class="uploader-name">${card.uploader || 'A Friend'}</div>
+            <div class="uploader-role">uploaded this memory</div>
           </div>
         </div>
       `;
@@ -1654,13 +1859,47 @@ function selectStyle(el, style) {
   document.querySelectorAll('.style-chip').forEach(c => c.classList.remove('selected'));
   el.classList.add('selected');
   selectedStyle = style;
+  updatePreview();
+}
+
+function updatePreview() {
+  const name = document.getElementById('uploader-name').value || 'Your Name';
+  const caption = document.getElementById('uploader-caption').value || 'Your caption here...';
+  document.getElementById('preview-name').textContent = name;
+  document.getElementById('preview-avatar').textContent = (name === 'Your Name' ? '?' : name[0].toUpperCase());
+  document.getElementById('preview-caption-text').textContent = caption;
+
+  // Update preview style class
+  const box = document.getElementById('preview-box');
+  box.className = 'preview-box';
+  const sty = selectedStyle === 'random' ? 'polaroid' : selectedStyle;
+  box.classList.add('theme-' + sty);
 }
 
 function handleFileUpload(e) {
   const files = e.target.files;
   if (!files.length) return;
+  uploadFiles = Array.from(files);
   const zone = document.getElementById('upload-zone');
   zone.innerHTML = `<div class="upload-icon">✅</div><p>${files.length} file(s) ready to upload</p>`;
+
+  // Show first image in preview
+  const firstFile = files[0];
+  if (firstFile.type.startsWith('image')) {
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const inner = document.getElementById('preview-inner');
+      document.getElementById('preview-placeholder').style.display = 'none';
+      const existing = inner.querySelector('.preview-img');
+      if (existing) existing.remove();
+      const img = document.createElement('img');
+      img.className = 'preview-img';
+      img.src = ev.target.result;
+      inner.insertBefore(img, inner.firstChild);
+      document.getElementById('preview-overlay').style.display = 'flex';
+    };
+    reader.readAsDataURL(firstFile);
+  }
 }
 
 function handleSongUpload(e) {
@@ -1673,38 +1912,96 @@ function handleSongUpload(e) {
   showToast('🎵 Song added — will play with your gallery!');
 }
 
-function submitUpload() {
-  const name = document.getElementById('uploader-name').value || 'A Friend';
+async function submitUpload() {
+  const name = document.getElementById('uploader-name').value.trim();
+  if (!name) {
+    showToast('⚠️ Please enter your name first');
+    document.getElementById('uploader-name').focus();
+    return;
+  }
   const caption = document.getElementById('uploader-caption').value || 'With love 💛';
   const style = selectedStyle === 'random' ? STYLES[Math.floor(Math.random() * STYLES.length)] : selectedStyle;
 
-  const emojis = {'polaroid':'📷','vhs':'🎬','neon':'💜','gold':'✨','watercolor':'🌸'};
+  const emojis = {'polaroid':'📷','vhs':'🎬','neon':'💜','gold':'✨','watercolor':'🌸','flower':'🌺','sidecap':'📝','filmstrip':'🎞️'};
   const bgs = {
     polaroid: 'linear-gradient(135deg, #f5f0e8 0%, #e8e0d0 100%)',
     vhs: 'linear-gradient(135deg, #002208 0%, #003811 100%)',
     neon: 'linear-gradient(135deg, #1a002a 0%, #3d0060 100%)',
     gold: 'linear-gradient(135deg, #2a1a00 0%, #3d2800 100%)',
-    watercolor: 'linear-gradient(135deg, #fff0f5 0%, #ffe0ec 100%)'
+    watercolor: 'linear-gradient(135deg, #fff0f5 0%, #ffe0ec 100%)',
+    flower: 'linear-gradient(135deg, #1a0f1e 0%, #2d1520 100%)',
+    sidecap: 'linear-gradient(135deg, #1a0a0f 0%, #2d1520 100%)',
+    filmstrip: 'linear-gradient(135deg, #111 0%, #222 100%)'
   };
 
+  let imageUrls = [];
+
+  // If files were selected, upload to Cloudinary via backend
+  if (uploadFiles.length > 0) {
+    const submitBtn = document.querySelector('#upload-modal .btn-full-gold');
+    const origText = submitBtn.textContent;
+    submitBtn.textContent = '⏳ Uploading...';
+    submitBtn.disabled = true;
+
+    try {
+      const formData = new FormData();
+      uploadFiles.forEach(f => formData.append('files', f));
+      formData.append('uploader', name);
+      formData.append('caption', caption);
+      formData.append('style', style);
+
+      const resp = await fetch(API_URL + '/api/upload', { method: 'POST', body: formData });
+      const data = await resp.json();
+
+      if (data.success && data.files) {
+        imageUrls = data.files.map(f => ({ url: f.url, isVideo: f.isVideo }));
+      } else {
+        showToast('⚠️ Upload issue — ' + (data.error || 'please try again'));
+        submitBtn.textContent = origText;
+        submitBtn.disabled = false;
+        return;
+      }
+    } catch (err) {
+      console.error('Upload error:', err);
+      showToast('⚠️ Upload failed — check connection');
+      submitBtn.textContent = origText;
+      submitBtn.disabled = false;
+      return;
+    }
+
+    submitBtn.textContent = origText;
+    submitBtn.disabled = false;
+  }
+
   // Add intro card
-  SAMPLE_CARDS.push({
-    type: 'intro',
-    person: name,
+  const introCard = {
+    type: 'intro', person: name, uploader: name,
     tagline: `"A memory lovingly shared just for Rita..."`,
     bg: 'linear-gradient(135deg, #1a0a0f 0%, #2d1520 100%)'
-  });
+  };
+  SAMPLE_CARDS.push(introCard);
+  db.ref("gallery").push(introCard);
 
-  // Add photo card
-  SAMPLE_CARDS.push({
-    type: 'photo',
-    style,
-    emoji: emojis[style] || '📸',
-    bg: bgs[style] || bgs.gold,
-    person: `From ${name}`,
-    caption,
-    color: '#fff'
-  });
+  // Add photo cards (one per uploaded file, or a placeholder if no files)
+  if (imageUrls.length > 0) {
+    imageUrls.forEach(f => {
+      const photoCard = {
+        type: 'photo', style, image: f.url, isVideo: f.isVideo,
+        person: `From ${name}`, caption, uploader: name,
+        emoji: emojis[style] || '📸', bg: bgs[style] || bgs.gold, color: '#fff'
+      };
+      SAMPLE_CARDS.push(photoCard);
+      db.ref("gallery").push(photoCard);
+    });
+  } else {
+    const photoCard = {
+      type: 'photo', style, uploader: name,
+      emoji: emojis[style] || '📸', bg: bgs[style] || bgs.gold,
+      person: `From ${name}`, caption, color: '#fff'
+    };
+    SAMPLE_CARDS.push(photoCard);
+    db.ref("gallery").push(photoCard);
+  }
 
   renderGallery();
   goToCard(SAMPLE_CARDS.length - 1);
@@ -1713,6 +2010,7 @@ function submitUpload() {
   launchConfetti();
 
   // Reset form
+  uploadFiles = [];
   document.getElementById('uploader-name').value = '';
   document.getElementById('uploader-caption').value = '';
   document.getElementById('upload-zone').innerHTML = `
@@ -1720,6 +2018,14 @@ function submitUpload() {
     <p>Drag & drop photos or videos<br><span>or click to browse</span></p>
     <input type="file" id="file-input" multiple accept="image/*,video/*" style="display:none" onchange="handleFileUpload(event)">
   `;
+  // Reset preview
+  document.getElementById('preview-placeholder').style.display = 'flex';
+  const existImg = document.querySelector('#preview-inner .preview-img');
+  if (existImg) existImg.remove();
+  document.getElementById('preview-overlay').style.display = 'none';
+  document.getElementById('preview-name').textContent = 'Your Name';
+  document.getElementById('preview-avatar').textContent = '?';
+  document.getElementById('preview-caption-text').textContent = 'Your caption here...';
 }
 
 // ═══════════════════════════════════════
