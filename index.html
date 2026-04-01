@@ -1,0 +1,1823 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Happy Birthday Rita 🎂</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #f0c060;
+    --gold-light: #fde99a;
+    --rose: #f472b6;
+    --rose-deep: #be185d;
+    --cream: #fff8f0;
+    --dark: #1a0a0f;
+    --dark2: #2d1520;
+    --coral: #ff7e67;
+    --purple: #c084fc;
+    --white: #ffffff;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--dark);
+    color: var(--white);
+    overflow-x: hidden;
+    cursor: default;
+  }
+
+  /* ── CONFETTI CANVAS ── */
+  #confetti-canvas {
+    position: fixed; top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none; z-index: 9999;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 18px 36px;
+    background: linear-gradient(180deg, rgba(26,10,15,0.95) 0%, transparent 100%);
+    backdrop-filter: blur(4px);
+  }
+
+  .nav-logo {
+    font-family: 'Dancing Script', cursive;
+    font-size: 1.6rem;
+    color: var(--gold);
+    text-shadow: 0 0 20px rgba(240,192,96,0.5);
+    letter-spacing: 1px;
+  }
+
+  .nav-icons { display: flex; gap: 20px; align-items: center; }
+
+  .nav-icon-btn {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.15);
+    color: var(--white);
+    width: 42px; height: 42px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.1rem; cursor: pointer;
+    transition: all 0.3s;
+    position: relative;
+  }
+
+  .nav-icon-btn:hover {
+    background: rgba(240,192,96,0.2);
+    border-color: var(--gold);
+    transform: scale(1.1);
+  }
+
+  .chat-badge {
+    position: absolute; top: -4px; right: -4px;
+    background: var(--rose);
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    font-size: 0.55rem;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700;
+    display: none;
+  }
+
+  /* ── LANDING ── */
+  #landing {
+    min-height: 100vh;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    position: relative;
+    overflow: hidden;
+    text-align: center;
+    padding: 100px 20px 60px;
+  }
+
+  .landing-bg {
+    position: absolute; inset: 0;
+    background: 
+      radial-gradient(ellipse 80% 60% at 50% 30%, rgba(244,114,182,0.25) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 40% at 20% 80%, rgba(192,132,252,0.2) 0%, transparent 50%),
+      radial-gradient(ellipse 50% 50% at 80% 70%, rgba(240,192,96,0.15) 0%, transparent 50%),
+      var(--dark);
+  }
+
+  .film-grain {
+    position: absolute; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    opacity: 0.4; pointer-events: none;
+  }
+
+  .sparkle-ring {
+    position: absolute;
+    width: 600px; height: 600px;
+    border-radius: 50%;
+    border: 1px solid rgba(240,192,96,0.1);
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    animation: pulse-ring 4s ease-in-out infinite;
+  }
+
+  .sparkle-ring:nth-child(2) {
+    width: 800px; height: 800px;
+    animation-delay: 1s;
+    border-color: rgba(244,114,182,0.08);
+  }
+
+  @keyframes pulse-ring {
+    0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.6; }
+    50% { transform: translate(-50%, -50%) scale(1.05); opacity: 1; }
+  }
+
+  .landing-content { position: relative; z-index: 2; }
+
+  .pre-title {
+    font-size: 0.8rem;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--gold-light);
+    margin-bottom: 12px;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.3s forwards;
+  }
+
+  .main-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(3rem, 10vw, 7rem);
+    font-weight: 900;
+    line-height: 1;
+    background: linear-gradient(135deg, var(--gold-light) 0%, var(--gold) 30%, var(--rose) 60%, var(--purple) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 8px;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.5s forwards;
+    text-shadow: none;
+    filter: drop-shadow(0 0 40px rgba(240,192,96,0.3));
+  }
+
+  .rita-name {
+    font-family: 'Dancing Script', cursive;
+    font-size: clamp(4rem, 14vw, 10rem);
+    background: linear-gradient(135deg, #fff 0%, var(--gold-light) 40%, var(--rose) 80%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.7s forwards;
+    filter: drop-shadow(0 0 50px rgba(244,114,182,0.4));
+  }
+
+  .subtitle {
+    margin-top: 24px;
+    font-size: 1rem;
+    color: rgba(255,255,255,0.6);
+    letter-spacing: 1px;
+    opacity: 0;
+    animation: fadeUp 0.8s 1s forwards;
+  }
+
+  .cta-row {
+    display: flex; gap: 16px; justify-content: center;
+    margin-top: 40px; flex-wrap: wrap;
+    opacity: 0;
+    animation: fadeUp 0.8s 1.2s forwards;
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, var(--gold) 0%, var(--coral) 100%);
+    color: var(--dark);
+    border: none;
+    padding: 16px 36px;
+    border-radius: 60px;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500;
+    font-size: 1rem;
+    cursor: pointer;
+    letter-spacing: 0.5px;
+    transition: all 0.3s;
+    box-shadow: 0 8px 32px rgba(240,192,96,0.3);
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 16px 40px rgba(240,192,96,0.5);
+  }
+
+  .btn-ghost {
+    background: rgba(255,255,255,0.06);
+    color: var(--white);
+    border: 1px solid rgba(255,255,255,0.2);
+    padding: 16px 36px;
+    border-radius: 60px;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 400;
+    font-size: 1rem;
+    cursor: pointer;
+    letter-spacing: 0.5px;
+    transition: all 0.3s;
+  }
+
+  .btn-ghost:hover {
+    background: rgba(255,255,255,0.12);
+    border-color: var(--rose);
+    transform: translateY(-3px);
+  }
+
+  .share-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 40px;
+    padding: 10px 20px;
+    font-size: 0.8rem;
+    color: rgba(255,255,255,0.5);
+    margin-top: 28px;
+    opacity: 0;
+    animation: fadeUp 0.8s 1.5s forwards;
+  }
+
+  .share-badge span { color: var(--gold); }
+
+  .scroll-hint {
+    position: absolute; bottom: 30px; left: 50%;
+    transform: translateX(-50%);
+    display: flex; flex-direction: column; align-items: center;
+    gap: 8px; color: rgba(255,255,255,0.3); font-size: 0.75rem;
+    letter-spacing: 2px; text-transform: uppercase;
+    animation: bounce 2s ease-in-out infinite;
+    opacity: 0;
+    animation: fadeIn 1s 2s forwards, bounce 2s 3s ease-in-out infinite;
+  }
+
+  .scroll-arrow {
+    width: 20px; height: 20px;
+    border-right: 1px solid rgba(255,255,255,0.3);
+    border-bottom: 1px solid rgba(255,255,255,0.3);
+    transform: rotate(45deg);
+  }
+
+  @keyframes bounce {
+    0%, 100% { transform: translateX(-50%) translateY(0); }
+    50% { transform: translateX(-50%) translateY(8px); }
+  }
+
+  /* ── GALLERY SECTION ── */
+  #gallery {
+    padding: 80px 20px 40px;
+    position: relative;
+  }
+
+  .section-header {
+    text-align: center;
+    margin-bottom: 50px;
+  }
+
+  .section-label {
+    font-size: 0.75rem;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 10px;
+  }
+
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-style: italic;
+    color: var(--white);
+  }
+
+  /* Swiper-style gallery */
+  .gallery-wrapper {
+    position: relative;
+    overflow: hidden;
+    padding: 20px 0 40px;
+  }
+
+  .gallery-track {
+    display: flex;
+    gap: 24px;
+    transition: transform 0.5s cubic-bezier(0.4,0,0.2,1);
+    padding: 0 calc(50vw - 200px);
+    align-items: center;
+  }
+
+  .gallery-card {
+    flex-shrink: 0;
+    width: 340px;
+    border-radius: 20px;
+    overflow: hidden;
+    position: relative;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.4,0,0.2,1);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+  }
+
+  .gallery-card.active {
+    transform: scale(1.06);
+    box-shadow: 0 30px 80px rgba(0,0,0,0.6);
+    z-index: 10;
+  }
+
+  .gallery-card:not(.active) {
+    transform: scale(0.92);
+    filter: brightness(0.7);
+  }
+
+  .card-inner {
+    width: 100%;
+    height: 420px;
+    position: relative;
+    display: flex; align-items: flex-end;
+  }
+
+  /* Style themes per person */
+  .theme-polaroid .card-inner {
+    background: #fff;
+    border: 12px solid #fff;
+    border-bottom: 50px solid #fff;
+    border-radius: 4px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  }
+
+  .theme-polaroid .card-photo {
+    filter: sepia(20%) contrast(1.1) saturate(0.9);
+  }
+
+  .theme-vhs .card-inner {
+    border: 3px solid #00ff88;
+    box-shadow: 0 0 20px rgba(0,255,136,0.3), inset 0 0 20px rgba(0,0,0,0.5);
+  }
+
+  .theme-vhs::before {
+    content: '⬤ REC  00:00:42';
+    position: absolute;
+    top: 12px; left: 12px;
+    font-size: 0.6rem; color: #ff3333;
+    letter-spacing: 2px;
+    z-index: 5;
+    font-family: monospace;
+    animation: blink 1s step-end infinite;
+  }
+
+  @keyframes blink { 50% { opacity: 0; } }
+
+  .theme-neon .card-inner {
+    border: 2px solid var(--rose);
+    box-shadow: 0 0 20px rgba(244,114,182,0.5), 0 0 60px rgba(244,114,182,0.2);
+  }
+
+  .theme-gold .card-inner {
+    border: 3px solid var(--gold);
+    box-shadow: 0 0 30px rgba(240,192,96,0.4);
+  }
+
+  .theme-watercolor .card-inner {
+    filter: saturate(1.4) contrast(0.9);
+  }
+
+  .card-photo {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .card-photo-placeholder {
+    width: 100%; height: 100%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 4rem;
+  }
+
+  .card-overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(180deg, transparent 40%, rgba(0,0,0,0.8) 100%);
+    display: flex; flex-direction: column; justify-content: flex-end;
+    padding: 20px;
+  }
+
+  .theme-polaroid .card-overlay {
+    background: transparent;
+    padding: 0; bottom: -40px; top: auto;
+    display: flex; justify-content: center; align-items: center;
+    color: #333;
+  }
+
+  .card-intro-tag {
+    font-size: 0.65rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--gold-light);
+    margin-bottom: 6px;
+    opacity: 0.8;
+  }
+
+  .card-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.2rem;
+    font-style: italic;
+    color: var(--white);
+  }
+
+  .card-caption {
+    font-size: 0.8rem;
+    color: rgba(255,255,255,0.6);
+    margin-top: 4px;
+  }
+
+  /* INTRO CINEMATIC CARD */
+  .intro-card .card-inner {
+    background: var(--dark2);
+    height: 420px;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .intro-card-content {
+    text-align: center;
+    padding: 30px;
+    position: relative; z-index: 2;
+  }
+
+  .intro-card-content .intro-label {
+    font-size: 0.6rem;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.4);
+    margin-bottom: 20px;
+  }
+
+  .intro-card-content .intro-person {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    font-style: italic;
+    color: var(--gold);
+    margin-bottom: 8px;
+  }
+
+  .intro-card-content .intro-tagline {
+    font-size: 0.85rem;
+    color: rgba(255,255,255,0.5);
+    font-style: italic;
+    line-height: 1.6;
+  }
+
+  .intro-divider {
+    width: 40px; height: 1px;
+    background: var(--gold);
+    margin: 16px auto;
+    opacity: 0.5;
+  }
+
+  .intro-card-bg {
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse at center, rgba(240,192,96,0.08) 0%, transparent 70%);
+  }
+
+  /* NAV ARROWS */
+  .gallery-nav {
+    display: flex; justify-content: center; gap: 16px; margin-top: 20px;
+  }
+
+  .gallery-btn {
+    width: 50px; height: 50px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.15);
+    color: var(--white);
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .gallery-btn:hover {
+    background: rgba(240,192,96,0.15);
+    border-color: var(--gold);
+    transform: scale(1.1);
+  }
+
+  .gallery-dots {
+    display: flex; gap: 8px; align-items: center; justify-content: center;
+    margin-top: 20px;
+  }
+
+  .dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.2);
+    transition: all 0.3s;
+    cursor: pointer;
+  }
+
+  .dot.active {
+    background: var(--gold);
+    width: 20px;
+    border-radius: 4px;
+  }
+
+  /* ── FAB BUTTONS ── */
+  .fab-group {
+    position: fixed;
+    bottom: 30px; right: 30px;
+    display: flex; flex-direction: column; gap: 12px;
+    z-index: 50;
+    align-items: flex-end;
+  }
+
+  .fab-label {
+    font-size: 0.75rem;
+    color: rgba(255,255,255,0.7);
+    background: rgba(26,10,15,0.9);
+    padding: 4px 12px;
+    border-radius: 20px;
+    white-space: nowrap;
+  }
+
+  .fab-row { display: flex; align-items: center; gap: 10px; }
+
+  .fab {
+    width: 56px; height: 56px;
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+    font-size: 1.3rem;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.3s;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+  }
+
+  .fab-add {
+    background: linear-gradient(135deg, var(--gold), var(--coral));
+    color: var(--dark);
+  }
+
+  .fab-add:hover {
+    transform: scale(1.12) rotate(10deg);
+    box-shadow: 0 12px 32px rgba(240,192,96,0.4);
+  }
+
+  .fab-message {
+    background: linear-gradient(135deg, var(--rose), var(--purple));
+    color: var(--white);
+  }
+
+  .fab-message:hover {
+    transform: scale(1.12);
+    box-shadow: 0 12px 32px rgba(244,114,182,0.4);
+  }
+
+  .fab-share {
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    color: var(--white);
+    width: 46px; height: 46px;
+  }
+
+  .fab-share:hover {
+    background: rgba(255,255,255,0.18);
+    transform: scale(1.1);
+  }
+
+  /* ── MODALS ── */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(10,0,8,0.85);
+    backdrop-filter: blur(8px);
+    z-index: 200;
+    display: flex; align-items: center; justify-content: center;
+    padding: 20px;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.3s;
+  }
+
+  .modal-overlay.open {
+    opacity: 1; pointer-events: all;
+  }
+
+  .modal {
+    background: var(--dark2);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 24px;
+    padding: 40px;
+    width: 100%;
+    max-width: 520px;
+    position: relative;
+    transform: translateY(20px);
+    transition: transform 0.3s;
+    box-shadow: 0 40px 100px rgba(0,0,0,0.6);
+  }
+
+  .modal-overlay.open .modal {
+    transform: translateY(0);
+  }
+
+  .modal-close {
+    position: absolute; top: 16px; right: 20px;
+    background: none; border: none; color: rgba(255,255,255,0.4);
+    font-size: 1.4rem; cursor: pointer;
+    transition: color 0.2s;
+  }
+
+  .modal-close:hover { color: var(--white); }
+
+  .modal-icon {
+    font-size: 2.5rem; text-align: center; margin-bottom: 12px;
+  }
+
+  .modal-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.8rem;
+    font-style: italic;
+    text-align: center;
+    margin-bottom: 6px;
+    color: var(--gold);
+  }
+
+  .modal-subtitle {
+    text-align: center;
+    color: rgba(255,255,255,0.5);
+    font-size: 0.85rem;
+    margin-bottom: 28px;
+    line-height: 1.6;
+  }
+
+  .upload-zone {
+    border: 2px dashed rgba(240,192,96,0.3);
+    border-radius: 16px;
+    padding: 40px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-bottom: 20px;
+  }
+
+  .upload-zone:hover {
+    border-color: var(--gold);
+    background: rgba(240,192,96,0.04);
+  }
+
+  .upload-zone .upload-icon { font-size: 2.5rem; margin-bottom: 10px; }
+  .upload-zone p { color: rgba(255,255,255,0.5); font-size: 0.85rem; line-height: 1.6; }
+  .upload-zone p span { color: var(--gold); cursor: pointer; }
+
+  .form-group { margin-bottom: 16px; }
+
+  .form-label {
+    display: block;
+    font-size: 0.75rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.4);
+    margin-bottom: 8px;
+  }
+
+  .form-input, .form-textarea, .form-select {
+    width: 100%;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 12px;
+    color: var(--white);
+    font-family: 'DM Sans', sans-serif;
+    padding: 14px 16px;
+    font-size: 0.95rem;
+    transition: border-color 0.3s;
+    outline: none;
+  }
+
+  .form-input:focus, .form-textarea:focus {
+    border-color: var(--gold);
+  }
+
+  .form-textarea { height: 120px; resize: none; line-height: 1.6; }
+
+  .style-picker {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
+    margin-bottom: 20px;
+  }
+
+  .style-chip {
+    padding: 10px;
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.1);
+    background: rgba(255,255,255,0.04);
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 0.75rem;
+    color: rgba(255,255,255,0.6);
+  }
+
+  .style-chip:hover, .style-chip.selected {
+    border-color: var(--gold);
+    background: rgba(240,192,96,0.1);
+    color: var(--gold);
+  }
+
+  .style-chip .style-icon { font-size: 1.4rem; display: block; margin-bottom: 4px; }
+
+  .toggle-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 0;
+    border-top: 1px solid rgba(255,255,255,0.06);
+    margin-bottom: 20px;
+  }
+
+  .toggle-label { font-size: 0.9rem; color: rgba(255,255,255,0.7); }
+  .toggle-sub { font-size: 0.75rem; color: rgba(255,255,255,0.3); margin-top: 2px; }
+
+  .toggle {
+    width: 48px; height: 26px;
+    border-radius: 13px;
+    background: rgba(255,255,255,0.1);
+    border: none; cursor: pointer;
+    position: relative;
+    transition: background 0.3s;
+    flex-shrink: 0;
+  }
+
+  .toggle.on { background: var(--rose); }
+
+  .toggle::after {
+    content: '';
+    position: absolute;
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    background: white;
+    top: 3px; left: 3px;
+    transition: transform 0.3s;
+  }
+
+  .toggle.on::after { transform: translateX(22px); }
+
+  .btn-full {
+    width: 100%;
+    padding: 16px;
+    border-radius: 14px;
+    border: none;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+
+  .btn-full-gold {
+    background: linear-gradient(135deg, var(--gold), var(--coral));
+    color: var(--dark);
+    box-shadow: 0 8px 24px rgba(240,192,96,0.25);
+  }
+
+  .btn-full-gold:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 32px rgba(240,192,96,0.4);
+  }
+
+  .btn-full-rose {
+    background: linear-gradient(135deg, var(--rose), var(--purple));
+    color: var(--white);
+    box-shadow: 0 8px 24px rgba(244,114,182,0.25);
+  }
+
+  .btn-full-rose:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 32px rgba(244,114,182,0.4);
+  }
+
+  /* ── CHAT / RITA'S INBOX ── */
+  #chat-modal .modal {
+    max-width: 480px;
+  }
+
+  .message-list {
+    max-height: 320px;
+    overflow-y: auto;
+    display: flex; flex-direction: column; gap: 12px;
+    padding-right: 4px;
+    margin-bottom: 20px;
+  }
+
+  .message-list::-webkit-scrollbar { width: 4px; }
+  .message-list::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); border-radius: 2px; }
+  .message-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
+
+  .message-card {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 16px;
+    padding: 16px;
+    position: relative;
+    animation: slideIn 0.4s ease forwards;
+  }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .message-from {
+    font-size: 0.7rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--rose);
+    margin-bottom: 6px;
+  }
+
+  .message-text {
+    font-size: 0.9rem;
+    color: rgba(255,255,255,0.8);
+    line-height: 1.6;
+    font-style: italic;
+  }
+
+  .empty-inbox {
+    text-align: center;
+    padding: 40px 20px;
+    color: rgba(255,255,255,0.25);
+    font-style: italic;
+  }
+
+  /* ── SUCCESS TOAST ── */
+  .toast {
+    position: fixed;
+    bottom: 100px; left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--dark2);
+    border: 1px solid rgba(240,192,96,0.3);
+    border-radius: 40px;
+    padding: 14px 28px;
+    font-size: 0.9rem;
+    color: var(--gold);
+    z-index: 300;
+    opacity: 0;
+    transition: all 0.4s;
+    white-space: nowrap;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+  }
+
+  .toast.show {
+    opacity: 1; transform: translateX(-50%) translateY(0);
+  }
+
+  /* ── CINEMATIC INTRO OVERLAY ── */
+  #cinematic-intro {
+    position: fixed; inset: 0;
+    background: black;
+    z-index: 500;
+    display: flex; align-items: center; justify-content: center;
+    flex-direction: column;
+    opacity: 1;
+    transition: opacity 1s;
+  }
+
+  #cinematic-intro.fade-out { opacity: 0; pointer-events: none; }
+
+  .cinematic-text {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1rem, 3vw, 1.5rem);
+    color: rgba(255,255,255,0.8);
+    letter-spacing: 6px;
+    text-transform: uppercase;
+    text-align: center;
+    opacity: 0;
+    animation: cinematicReveal 2s 0.5s forwards;
+  }
+
+  .cinematic-sub {
+    font-size: 0.75rem;
+    letter-spacing: 4px;
+    color: var(--gold);
+    margin-top: 16px;
+    text-transform: uppercase;
+    opacity: 0;
+    animation: cinematicReveal 1.5s 1.5s forwards;
+  }
+
+  @keyframes cinematicReveal {
+    0% { opacity: 0; letter-spacing: 15px; }
+    100% { opacity: 1; letter-spacing: 6px; }
+  }
+
+  /* ── SONG BAR ── */
+  .song-bar {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    height: 70px;
+    background: rgba(26,10,15,0.95);
+    backdrop-filter: blur(12px);
+    border-top: 1px solid rgba(255,255,255,0.06);
+    display: flex; align-items: center;
+    padding: 0 24px;
+    gap: 16px;
+    z-index: 40;
+    transform: translateY(100%);
+    transition: transform 0.5s cubic-bezier(0.4,0,0.2,1);
+  }
+
+  .song-bar.visible { transform: translateY(0); }
+
+  .song-thumb {
+    width: 42px; height: 42px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, var(--gold), var(--rose));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.1rem; flex-shrink: 0;
+  }
+
+  .song-info { flex: 1; min-width: 0; }
+
+  .song-title {
+    font-size: 0.85rem; font-weight: 500;
+    color: var(--white);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+
+  .song-artist {
+    font-size: 0.7rem; color: rgba(255,255,255,0.4);
+  }
+
+  .song-progress {
+    flex: 2;
+    height: 3px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 2px;
+    overflow: hidden;
+    cursor: pointer;
+  }
+
+  .song-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--gold), var(--rose));
+    width: 0%;
+    transition: width 0.1s linear;
+    border-radius: 2px;
+  }
+
+  .song-play-btn {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: var(--gold);
+    border: none;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.9rem;
+    color: var(--dark);
+    transition: transform 0.2s;
+    flex-shrink: 0;
+  }
+
+  .song-play-btn:hover { transform: scale(1.1); }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  /* ── SHARE MODAL ── */
+  .share-row {
+    display: flex; gap: 12px; margin-bottom: 20px;
+  }
+
+  .share-btn {
+    flex: 1;
+    padding: 14px;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.1);
+    background: rgba(255,255,255,0.04);
+    color: var(--white);
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.85rem;
+    transition: all 0.2s;
+    text-align: center;
+  }
+
+  .share-btn:hover {
+    background: rgba(255,255,255,0.1);
+    border-color: rgba(255,255,255,0.25);
+  }
+
+  .link-copy-row {
+    display: flex; gap: 10px; align-items: center;
+  }
+
+  .link-input {
+    flex: 1;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 10px;
+    padding: 12px 14px;
+    color: rgba(255,255,255,0.5);
+    font-size: 0.8rem;
+    font-family: monospace;
+    outline: none;
+  }
+
+  .copy-btn {
+    padding: 12px 18px;
+    border-radius: 10px;
+    background: var(--gold);
+    color: var(--dark);
+    border: none;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500;
+    font-size: 0.85rem;
+    transition: all 0.2s;
+  }
+
+  .copy-btn:hover { transform: scale(1.04); }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 600px) {
+    nav { padding: 14px 20px; }
+    .fab-group { bottom: 90px; right: 16px; }
+    .gallery-track { padding: 0 calc(50vw - 150px); }
+    .gallery-card { width: 280px; }
+    .card-inner { height: 360px; }
+    .modal { padding: 28px 20px; }
+  }
+  .hero-slanted-image {
+    position: absolute;
+    top: 45%; 
+    right: 15%; 
+    transform: translateY(-50%) rotate(12deg);
+    width: 280px;
+    height: 350px;
+    object-fit: cover;
+    border-radius: 4px;
+    border: 12px solid #fff;
+    border-bottom-width: 45px;
+    box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+    z-index: 1; 
+    opacity: 0;
+    animation: floatInSlanted 1.2s 0.8s forwards;
+    pointer-events: none;
+  }
+
+  @keyframes floatInSlanted {
+    from { opacity: 0; transform: translateY(-40%) rotate(0deg) scale(0.9); }
+    to { opacity: 1; transform: translateY(-50%) rotate(12deg) scale(1); }
+  }
+
+  @media (max-width: 800px) {
+    .hero-slanted-image {
+      right: 50%;
+      top: 25%;
+      width: 220px;
+      height: 280px;
+      transform: translate(50%, -50%) rotate(8deg);
+      opacity: 0.3;
+      z-index: 0;
+    }
+    @keyframes floatInSlanted {
+      from { opacity: 0; transform: translate(50%, -40%) rotate(0deg) scale(0.9); }
+      to { opacity: 0.3; transform: translate(50%, -50%) rotate(8deg) scale(1); }
+    }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="confetti-canvas"></canvas>
+
+<!-- CINEMATIC INTRO -->
+<div id="cinematic-intro">
+  <div class="cinematic-text">A celebration of a wonderful soul</div>
+  <div class="cinematic-sub">✦ Rita's Birthday Cinema ✦</div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">✓ Done!</div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">Rita's Birthday</div>
+  <div class="nav-icons">
+    <button class="nav-icon-btn" onclick="openModal('share-modal')" title="Share">
+      🔗
+    </button>
+    <button class="nav-icon-btn" onclick="openModal('chat-modal')" title="Rita's inbox" id="chat-nav-btn">
+      💌
+      <span class="chat-badge" id="chat-badge">0</span>
+    </button>
+  </div>
+</nav>
+
+<!-- ═══════════ LANDING ═══════════ -->
+<section id="landing">
+  <div class="landing-bg"></div>
+  <div class="film-grain"></div>
+  <div class="sparkle-ring"></div>
+  <div class="sparkle-ring"></div>
+
+  <img src="assets/r3.jpeg" class="hero-slanted-image" alt="Rita" />
+
+  <div class="landing-content">
+    <div class="pre-title">✦ A Special Day For A Special Soul ✦</div>
+    <h1 class="main-title">Happy Birthday</h1>
+    <div class="rita-name">Rita</div>
+    <p class="subtitle">Celebrating you — from everyone who loves you 🎂</p>
+
+    <div class="cta-row">
+      <button class="btn-primary" onclick="scrollToGallery()">🎉 See the Memories</button>
+      <button class="btn-ghost" onclick="openModal('upload-modal')">📸 Add Your Memory</button>
+    </div>
+
+    <div class="share-badge">
+      <span>🔗</span> Share like Google Photos — <span>one link for everyone</span>
+    </div>
+  </div>
+
+  <div class="scroll-hint">
+    <span>Scroll</span>
+    <div class="scroll-arrow"></div>
+  </div>
+</section>
+
+<!-- ═══════════ GALLERY ═══════════ -->
+<section id="gallery">
+  <div class="section-header">
+    <div class="section-label">✦ The Memories ✦</div>
+    <h2 class="section-title">Swipe through the love</h2>
+  </div>
+
+  <div class="gallery-wrapper">
+    <div class="gallery-track" id="gallery-track">
+      <!-- Cards injected by JS -->
+    </div>
+  </div>
+
+  <div class="gallery-nav">
+    <button class="gallery-btn" onclick="slideGallery(-1)">←</button>
+    <button class="gallery-btn" onclick="slideGallery(1)">→</button>
+  </div>
+
+  <div class="gallery-dots" id="gallery-dots"></div>
+</section>
+
+<!-- FAB GROUP -->
+<div class="fab-group">
+  <div class="fab-row">
+    <div class="fab-label">Share this page</div>
+    <button class="fab fab-share" onclick="openModal('share-modal')">🔗</button>
+  </div>
+  <div class="fab-row">
+    <div class="fab-label">Send Rita a wish</div>
+    <button class="fab fab-message" onclick="openModal('message-modal')">💌</button>
+  </div>
+  <div class="fab-row">
+    <div class="fab-label">Add your memory</div>
+    <button class="fab fab-add" onclick="openModal('upload-modal')">+</button>
+  </div>
+</div>
+
+<!-- BACKGROUND MUSIC -->
+<audio id="bg-music" src="assets/music.mp3" loop preload="auto"></audio>
+
+<!-- SONG BAR -->
+<div class="song-bar" id="song-bar">
+  <div class="song-thumb">🎵</div>
+  <div class="song-info">
+    <div class="song-title" id="song-title-bar">Birthday Song</div>
+    <div class="song-artist" id="song-artist-bar">Uploaded by you</div>
+  </div>
+  <div class="song-progress" onclick="seekSong(event)">
+    <div class="song-progress-fill" id="song-progress-fill"></div>
+  </div>
+  <button class="song-play-btn" id="song-play-btn" onclick="togglePlay()">▶</button>
+</div>
+
+<!-- ═══════════ MODALS ═══════════ -->
+
+<!-- UPLOAD MODAL -->
+<div class="modal-overlay" id="upload-modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('upload-modal')">×</button>
+    <div class="modal-icon">📸</div>
+    <div class="modal-title">Add Your Memory</div>
+    <div class="modal-subtitle">Your photos & videos will appear as a cinematic intro in the gallery — like a movie credit for your friendship with Rita</div>
+
+    <div class="upload-zone" id="upload-zone" onclick="document.getElementById('file-input').click()">
+      <div class="upload-icon">🖼️</div>
+      <p>Drag & drop photos or videos<br><span>or click to browse</span></p>
+      <input type="file" id="file-input" multiple accept="image/*,video/*" style="display:none" onchange="handleFileUpload(event)">
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Upload Your Song (optional)</label>
+      <div class="upload-zone" style="padding:20px" onclick="document.getElementById('song-input').click()">
+        <div class="upload-icon" style="font-size:1.5rem">🎵</div>
+        <p style="font-size:0.8rem">MP3 or audio file — becomes your moment's soundtrack</p>
+        <input type="file" id="song-input" accept="audio/*" style="display:none" onchange="handleSongUpload(event)">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Your Name (optional)</label>
+      <input type="text" class="form-input" id="uploader-name" placeholder="e.g. Sarah or Anonymous">
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Caption for Rita</label>
+      <textarea class="form-textarea" id="uploader-caption" placeholder="Happy birthday Rita! Remember when we..."></textarea>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Choose your style</label>
+      <div class="style-picker">
+        <div class="style-chip selected" onclick="selectStyle(this, 'polaroid')">
+          <span class="style-icon">📷</span>Polaroid
+        </div>
+        <div class="style-chip" onclick="selectStyle(this, 'vhs')">
+          <span class="style-icon">📼</span>VHS
+        </div>
+        <div class="style-chip" onclick="selectStyle(this, 'neon')">
+          <span class="style-icon">💜</span>Neon
+        </div>
+        <div class="style-chip" onclick="selectStyle(this, 'gold')">
+          <span class="style-icon">✨</span>Gold
+        </div>
+        <div class="style-chip" onclick="selectStyle(this, 'watercolor')">
+          <span class="style-icon">🎨</span>Watercolor
+        </div>
+        <div class="style-chip" onclick="selectStyle(this, 'random')">
+          <span class="style-icon">🎲</span>Surprise
+        </div>
+      </div>
+    </div>
+
+    <button class="btn-full btn-full-gold" onclick="submitUpload()">🎬 Add to the Celebration</button>
+  </div>
+</div>
+
+<!-- MESSAGE MODAL -->
+<div class="modal-overlay" id="message-modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('message-modal')">×</button>
+    <div class="modal-icon">💌</div>
+    <div class="modal-title">Send Rita a Wish</div>
+    <div class="modal-subtitle">Your message goes straight to Rita's private inbox. She'll read it personally.</div>
+
+    <div class="form-group">
+      <label class="form-label">Your message</label>
+      <textarea class="form-textarea" id="message-text" placeholder="Dear Rita, you make every day brighter because..."></textarea>
+    </div>
+
+    <div class="toggle-row">
+      <div>
+        <div class="toggle-label">Keep me anonymous</div>
+        <div class="toggle-sub">Rita won't know who sent this</div>
+      </div>
+      <button class="toggle on" id="anon-toggle" onclick="toggleAnon()"></button>
+    </div>
+
+    <div id="sender-name-group" class="form-group" style="display:none">
+      <label class="form-label">Your name</label>
+      <input type="text" class="form-input" id="sender-name" placeholder="Your name">
+    </div>
+
+    <button class="btn-full btn-full-rose" onclick="sendMessage()">💌 Send to Rita</button>
+  </div>
+</div>
+
+<!-- CHAT MODAL (RITA'S INBOX) -->
+<div class="modal-overlay" id="chat-modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('chat-modal')">×</button>
+    <div class="modal-icon">💌</div>
+    <div class="modal-title">Rita's Inbox</div>
+    <div class="modal-subtitle">These are your birthday wishes — private just for you 🎀</div>
+    <div class="message-list" id="message-list">
+      <div class="empty-inbox">No messages yet...<br>Be the first to wish Rita! 🌸</div>
+    </div>
+    <button class="btn-full btn-full-rose" onclick="closeModal('chat-modal'); openModal('message-modal')">
+      + Send Rita a wish
+    </button>
+  </div>
+</div>
+
+<!-- SHARE MODAL -->
+<div class="modal-overlay" id="share-modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('share-modal')">×</button>
+    <div class="modal-icon">🔗</div>
+    <div class="modal-title">Share the Celebration</div>
+    <div class="modal-subtitle">Send this link to everyone who loves Rita — no login needed!</div>
+    <div class="share-row">
+      <button class="share-btn" onclick="shareVia('whatsapp')">💬 WhatsApp</button>
+      <button class="share-btn" onclick="shareVia('instagram')">📷 Instagram</button>
+      <button class="share-btn" onclick="shareVia('email')">✉️ Email</button>
+    </div>
+    <div class="link-copy-row">
+      <input type="text" class="link-input" value="ritasbirthday.cinema/rita2026" readonly>
+      <button class="copy-btn" onclick="copyLink()">Copy</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════
+let currentCard = 0;
+let selectedStyle = 'polaroid';
+let messages = [];
+let messageSent = false;
+let isPlaying = false;
+let songProgress = 0;
+let songInterval = null;
+let currentSongName = null;
+
+const STYLES = ['polaroid','vhs','neon','gold','watercolor'];
+
+const SAMPLE_CARDS = [
+  {
+    type: 'intro',
+    person: 'Everyone',
+    tagline: '"To the one who makes every room brighter..."',
+    bg: 'linear-gradient(135deg, #1a0a0f 0%, #2d1520 100%)'
+  },
+  {
+    type: 'photo',
+    style: 'gold',
+    image: 'assets/r1.jpeg',
+    bg: 'linear-gradient(135deg, #fde99a22 0%, #f0c06044 100%)',
+    person: 'From Mum',
+    caption: 'My forever girl 💛',
+    color: '#fff8e0'
+  },
+  {
+    type: 'intro',
+    person: 'Sarah & Jake',
+    tagline: '"Featuring memories from your favourite chaos duo..."',
+    bg: 'linear-gradient(135deg, #1a0a0f 0%, #4a1030 100%)'
+  },
+  {
+    type: 'photo',
+    style: 'neon',
+    image: 'assets/r2.jpeg',
+    bg: 'linear-gradient(135deg, #be185d22 0%, #c084fc44 100%)',
+    person: 'From Sarah',
+    caption: 'Best birthday twins ever 💜',
+    color: '#fce7f3'
+  },
+  {
+    type: 'photo',
+    style: 'vhs',
+    image: 'assets/video.mp4',
+    isVideo: true,
+    bg: 'linear-gradient(135deg, #00220d 0%, #003311 100%)',
+    person: 'From Jake',
+    caption: 'The legendary night... 🤣',
+    color: '#d1fae5'
+  },
+  {
+    type: 'intro',
+    person: 'The Work Crew',
+    tagline: '"A tribute from those who share your Monday mornings..."',
+    bg: 'linear-gradient(135deg, #0a0a1a 0%, #1a1a3a 100%)'
+  },
+  {
+    type: 'photo',
+    style: 'watercolor',
+    image: 'assets/r6.jpeg',
+    bg: 'linear-gradient(135deg, #f97316 22%, #fde68a44 100%)',
+    person: 'From The Office',
+    caption: 'Who keeps our team sane? YOU do 🧡',
+    color: '#fff7ed'
+  },
+  {
+    type: 'photo',
+    style: 'polaroid',
+    image: 'assets/r7.jpeg',
+    bg: 'linear-gradient(135deg, #0ea5e922 0%, #7dd3fc44 100%)',
+    person: 'From Lily',
+    caption: 'This summer was everything 🌊',
+    color: '#e0f2fe'
+  }
+];
+
+// ═══════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════
+let bgMusic = null;
+let musicWasPlaying = false;
+
+window.onload = () => {
+  bgMusic = document.getElementById('bg-music');
+  
+  bgMusic.addEventListener('timeupdate', () => {
+    songProgress = (bgMusic.currentTime / bgMusic.duration) * 100 || 0;
+    document.getElementById('song-progress-fill').style.width = songProgress + '%';
+  });
+  bgMusic.addEventListener('play', () => {
+    isPlaying = true;
+    document.getElementById('song-play-btn').textContent = '⏸';
+  });
+  bgMusic.addEventListener('pause', () => {
+    isPlaying = false;
+    document.getElementById('song-play-btn').textContent = '▶';
+  });
+
+  // Cinematic intro
+  setTimeout(() => {
+    document.getElementById('cinematic-intro').classList.add('fade-out');
+    setTimeout(() => {
+      document.getElementById('cinematic-intro').style.display = 'none';
+      launchConfetti();
+    }, 1000);
+  }, 3000);
+
+  renderGallery();
+  setupDrag();
+};
+
+// ═══════════════════════════════════════
+//  GALLERY
+// ═══════════════════════════════════════
+function renderGallery() {
+  const track = document.getElementById('gallery-track');
+  const dotsContainer = document.getElementById('gallery-dots');
+  track.innerHTML = '';
+  dotsContainer.innerHTML = '';
+
+  SAMPLE_CARDS.forEach((card, i) => {
+    const el = document.createElement('div');
+    el.className = `gallery-card ${card.type === 'intro' ? 'intro-card' : ''} theme-${card.style || ''} ${i === currentCard ? 'active' : ''}`;
+    el.setAttribute('data-index', i);
+
+    if (card.type === 'intro') {
+      el.innerHTML = `
+        <div class="card-inner" style="background:${card.bg}">
+          <div class="intro-card-bg"></div>
+          <div class="intro-card-content">
+            <div class="intro-label">✦ featuring ✦</div>
+            <div class="intro-person">${card.person}</div>
+            <div class="intro-divider"></div>
+            <div class="intro-tagline">${card.tagline}</div>
+          </div>
+        </div>
+      `;
+    } else {
+      el.innerHTML = `
+        <div class="card-inner" style="background:${card.bg}">
+          ${card.isVideo
+            ? `<video src="${card.image}" class="card-photo" loop playsinline></video>`
+            : card.image 
+              ? `<img src="${card.image}" class="card-photo" alt="Memory" />` 
+              : `<div class="card-photo-placeholder" style="background:${card.bg}; color:${card.color || '#fff'}; font-size:5rem">${card.emoji}</div>`
+          }
+          <div class="card-overlay">
+            <div class="card-intro-tag">memory from</div>
+            <div class="card-name">${card.person}</div>
+            <div class="card-caption">${card.caption}</div>
+          </div>
+        </div>
+      `;
+    }
+
+    el.onclick = () => goToCard(i);
+    track.appendChild(el);
+
+    const dot = document.createElement('div');
+    dot.className = `dot ${i === currentCard ? 'active' : ''}`;
+    dot.onclick = () => goToCard(i);
+    dotsContainer.appendChild(dot);
+  });
+
+  updateTrackPosition();
+}
+
+function goToCard(i) {
+  currentCard = Math.max(0, Math.min(i, SAMPLE_CARDS.length - 1));
+  updateTrackPosition();
+  updateDots();
+  updateCardClasses();
+
+  // Handle Video auto-play/pause and background music
+  const currentItem = SAMPLE_CARDS[currentCard];
+  const allVideos = document.querySelectorAll('video');
+  allVideos.forEach(v => v.pause());
+
+  if (currentItem && currentItem.isVideo) {
+    if (bgMusic && !bgMusic.paused) {
+      musicWasPlaying = true;
+      bgMusic.pause();
+    }
+    const activeVideo = document.querySelector(`.gallery-card[data-index="${currentCard}"] video`);
+    if (activeVideo) activeVideo.play().catch(e => console.log(e));
+  } else {
+    if (musicWasPlaying && bgMusic) {
+      bgMusic.play().catch(e => console.log(e));
+      musicWasPlaying = false;
+    }
+  }
+}
+
+function slideGallery(dir) {
+  goToCard(currentCard + dir);
+}
+
+function updateTrackPosition() {
+  const track = document.getElementById('gallery-track');
+  const cardW = window.innerWidth <= 600 ? 280 : 340;
+  const gap = 24;
+  const offset = currentCard * (cardW + gap);
+  track.style.transform = `translateX(-${offset}px)`;
+}
+
+function updateDots() {
+  document.querySelectorAll('.dot').forEach((d, i) => {
+    d.classList.toggle('active', i === currentCard);
+  });
+}
+
+function updateCardClasses() {
+  document.querySelectorAll('.gallery-card').forEach((c, i) => {
+    c.classList.toggle('active', i === currentCard);
+  });
+}
+
+// ═══════════════════════════════════════
+//  DRAG TO SWIPE
+// ═══════════════════════════════════════
+function setupDrag() {
+  const wrapper = document.querySelector('.gallery-wrapper');
+  let startX = 0, isDragging = false;
+
+  wrapper.addEventListener('mousedown', e => { startX = e.clientX; isDragging = true; });
+  wrapper.addEventListener('touchstart', e => { startX = e.touches[0].clientX; isDragging = true; }, {passive:true});
+
+  window.addEventListener('mouseup', e => {
+    if (!isDragging) return; isDragging = false;
+    const diff = startX - e.clientX;
+    if (Math.abs(diff) > 50) slideGallery(diff > 0 ? 1 : -1);
+  });
+
+  window.addEventListener('touchend', e => {
+    if (!isDragging) return; isDragging = false;
+    const diff = startX - e.changedTouches[0].clientX;
+    if (Math.abs(diff) > 50) slideGallery(diff > 0 ? 1 : -1);
+  });
+}
+
+// ═══════════════════════════════════════
+//  MODALS
+// ═══════════════════════════════════════
+function openModal(id) {
+  document.getElementById(id).classList.add('open');
+}
+
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+}
+
+// Close on overlay click
+document.querySelectorAll('.modal-overlay').forEach(el => {
+  el.addEventListener('click', e => {
+    if (e.target === el) el.classList.remove('open');
+  });
+});
+
+// ═══════════════════════════════════════
+//  UPLOAD
+// ═══════════════════════════════════════
+function selectStyle(el, style) {
+  document.querySelectorAll('.style-chip').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedStyle = style;
+}
+
+function handleFileUpload(e) {
+  const files = e.target.files;
+  if (!files.length) return;
+  const zone = document.getElementById('upload-zone');
+  zone.innerHTML = `<div class="upload-icon">✅</div><p>${files.length} file(s) ready to upload</p>`;
+}
+
+function handleSongUpload(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  currentSongName = file.name.replace(/\.[^.]+$/, '');
+  const bar = document.getElementById('song-bar');
+  document.getElementById('song-title-bar').textContent = currentSongName;
+  bar.classList.add('visible');
+  showToast('🎵 Song added — will play with your gallery!');
+}
+
+function submitUpload() {
+  const name = document.getElementById('uploader-name').value || 'A Friend';
+  const caption = document.getElementById('uploader-caption').value || 'With love 💛';
+  const style = selectedStyle === 'random' ? STYLES[Math.floor(Math.random() * STYLES.length)] : selectedStyle;
+
+  const emojis = {'polaroid':'📷','vhs':'🎬','neon':'💜','gold':'✨','watercolor':'🌸'};
+  const bgs = {
+    polaroid: 'linear-gradient(135deg, #f5f0e8 0%, #e8e0d0 100%)',
+    vhs: 'linear-gradient(135deg, #002208 0%, #003811 100%)',
+    neon: 'linear-gradient(135deg, #1a002a 0%, #3d0060 100%)',
+    gold: 'linear-gradient(135deg, #2a1a00 0%, #3d2800 100%)',
+    watercolor: 'linear-gradient(135deg, #fff0f5 0%, #ffe0ec 100%)'
+  };
+
+  // Add intro card
+  SAMPLE_CARDS.push({
+    type: 'intro',
+    person: name,
+    tagline: `"A memory lovingly shared just for Rita..."`,
+    bg: 'linear-gradient(135deg, #1a0a0f 0%, #2d1520 100%)'
+  });
+
+  // Add photo card
+  SAMPLE_CARDS.push({
+    type: 'photo',
+    style,
+    emoji: emojis[style] || '📸',
+    bg: bgs[style] || bgs.gold,
+    person: `From ${name}`,
+    caption,
+    color: '#fff'
+  });
+
+  renderGallery();
+  goToCard(SAMPLE_CARDS.length - 1);
+  closeModal('upload-modal');
+  showToast('🎬 Your memory was added to the gallery!');
+  launchConfetti();
+
+  // Reset form
+  document.getElementById('uploader-name').value = '';
+  document.getElementById('uploader-caption').value = '';
+  document.getElementById('upload-zone').innerHTML = `
+    <div class="upload-icon">🖼️</div>
+    <p>Drag & drop photos or videos<br><span>or click to browse</span></p>
+    <input type="file" id="file-input" multiple accept="image/*,video/*" style="display:none" onchange="handleFileUpload(event)">
+  `;
+}
+
+// ═══════════════════════════════════════
+//  MESSAGE
+// ═══════════════════════════════════════
+let anonOn = true;
+
+function toggleAnon() {
+  anonOn = !anonOn;
+  const btn = document.getElementById('anon-toggle');
+  btn.classList.toggle('on', anonOn);
+  document.getElementById('sender-name-group').style.display = anonOn ? 'none' : 'block';
+}
+
+function sendMessage() {
+  const text = document.getElementById('message-text').value.trim();
+  if (!text) { showToast('Write something for Rita first! 💌'); return; }
+
+  const from = anonOn ? 'Anonymous ✨' : (document.getElementById('sender-name').value || 'A Friend');
+
+  messages.push({ from, text });
+  renderMessages();
+
+  // Badge
+  const badge = document.getElementById('chat-badge');
+  badge.style.display = 'flex';
+  badge.textContent = messages.length;
+
+  closeModal('message-modal');
+  showToast(`💌 Wish sent to Rita!`);
+
+  document.getElementById('message-text').value = '';
+}
+
+function renderMessages() {
+  const list = document.getElementById('message-list');
+  if (!messages.length) {
+    list.innerHTML = '<div class="empty-inbox">No messages yet... 🌸</div>';
+    return;
+  }
+  list.innerHTML = messages.map(m => `
+    <div class="message-card">
+      <div class="message-from">💌 ${m.from}</div>
+      <div class="message-text">"${m.text}"</div>
+    </div>
+  `).join('');
+}
+
+// ═══════════════════════════════════════
+//  SHARE
+// ═══════════════════════════════════════
+function shareVia(platform) {
+  const url = 'ritasbirthday.cinema/rita2026';
+  const text = "🎂 Come celebrate Rita's birthday! See all our memories here:";
+  const platforms = {
+    whatsapp: `https://wa.me/?text=${encodeURIComponent(text + ' ' + url)}`,
+    instagram: null,
+    email: `mailto:?subject=Rita's Birthday Celebration!&body=${encodeURIComponent(text + '\n\n' + url)}`
+  };
+  if (platforms[platform]) window.open(platforms[platform], '_blank');
+  else showToast('💜 Copy the link and paste in Instagram!');
+}
+
+function copyLink() {
+  navigator.clipboard.writeText('ritasbirthday.cinema/rita2026').catch(() => {});
+  showToast('🔗 Link copied!');
+}
+
+// ═══════════════════════════════════════
+//  SONG PLAYER
+// ═══════════════════════════════════════
+function togglePlay() {
+  if (!bgMusic) return;
+  if (bgMusic.paused) {
+    bgMusic.play().catch(e => console.log(e));
+  } else {
+    bgMusic.pause();
+  }
+}
+
+function seekSong(e) {
+  if (!bgMusic || !bgMusic.duration) return;
+  const bar = e.currentTarget;
+  const rect = bar.getBoundingClientRect();
+  const percent = (e.clientX - rect.left) / rect.width;
+  bgMusic.currentTime = percent * bgMusic.duration;
+}
+
+// ═══════════════════════════════════════
+//  SCROLL UTIL
+// ═══════════════════════════════════════
+function scrollToGallery() {
+  document.getElementById('gallery').scrollIntoView({ behavior: 'smooth' });
+}
+
+// ═══════════════════════════════════════
+//  TOAST
+// ═══════════════════════════════════════
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+// ═══════════════════════════════════════
+//  CONFETTI
+// ═══════════════════════════════════════
+function launchConfetti() {
+  const canvas = document.getElementById('confetti-canvas');
+  const ctx = canvas.getContext('2d');
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  const pieces = Array.from({length: 120}, () => ({
+    x: Math.random() * canvas.width,
+    y: Math.random() * canvas.height - canvas.height,
+    w: Math.random() * 10 + 5,
+    h: Math.random() * 6 + 3,
+    r: Math.random() * Math.PI * 2,
+    dr: (Math.random() - 0.5) * 0.2,
+    dy: Math.random() * 3 + 2,
+    dx: (Math.random() - 0.5) * 2,
+    color: ['#f0c060','#f472b6','#c084fc','#ff7e67','#fff','#fde99a'][Math.floor(Math.random() * 6)]
+  }));
+
+  let frame = 0;
+  const animate = () => {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    pieces.forEach(p => {
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.r);
+      ctx.fillStyle = p.color;
+      ctx.fillRect(-p.w/2, -p.h/2, p.w, p.h);
+      ctx.restore();
+      p.x += p.dx; p.y += p.dy; p.r += p.dr;
+    });
+    frame++;
+    if (frame < 200) requestAnimationFrame(animate);
+    else ctx.clearRect(0, 0, canvas.width, canvas.height);
+  };
+  animate();
+}
+
+// Keyboard nav
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight') slideGallery(1);
+  if (e.key === 'ArrowLeft') slideGallery(-1);
+  if (e.key === 'Escape') document.querySelectorAll('.modal-overlay.open').forEach(m => m.classList.remove('open'));
+});
+
+window.addEventListener('resize', updateTrackPosition);
+</script>
+</body>
+</html>
