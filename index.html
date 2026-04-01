@@ -1410,6 +1410,11 @@ window.onload = () => {
       if(data.subTitle) document.querySelector('.subtitle').textContent = data.subTitle;
       if(data.nav) document.querySelector('.nav-logo').childNodes[0].textContent = data.nav + " ";
       if(data.color) document.documentElement.style.setProperty('--gold', data.color);
+    } else {
+      // Setup literal defaults so a freshly connected empty database does not appear broken
+      document.querySelector('.main-title').textContent = "Happy Birthday";
+      document.querySelector('.pre-title').textContent = "✦ A Special Day For A Special Soul ✦";
+      document.querySelector('.subtitle').textContent = "Celebrating you — from everyone who loves you 🎂";
     }
   });
 
@@ -1436,23 +1441,35 @@ window.onload = () => {
       </div>
     `;
 
-    db.ref("privateChat").orderByChild("timestamp").on('value', snap => {
-      let msgs = "";
-      let count = 0;
-      snap.forEach(child => {
-        msgs += `<div class="message-card"><div class="message-from">${child.val().sender}</div><div class="message-text">"${child.val().text}"</div></div>`;
-        count++;
+    let ritaMsgs = [];
+    const updateRitaUI = () => {
+      ritaMsgs.sort((a,b) => a.timestamp - b.timestamp);
+      let html = "";
+      ritaMsgs.forEach(m => {
+        const badge = m.isPrivate ? "🔒 " : "💌 ";
+        html += `<div class="message-card"><div class="message-from">${badge}${m.sender}</div><div class="message-text">"${m.text}"</div></div>`;
       });
-      document.getElementById('message-list').innerHTML = msgs || '<div class="empty-inbox">No secret chats yet...</div>';
-      if(count > 0) {
+      document.getElementById('message-list').innerHTML = html || '<div class="empty-inbox">No messages yet...</div>';
+      if(ritaMsgs.length > 0) {
         document.getElementById('chat-badge').style.display = 'flex';
-        document.getElementById('chat-badge').textContent = count;
+        document.getElementById('chat-badge').textContent = ritaMsgs.length;
       }
+    };
+
+    db.ref("privateChat").on('value', snap => {
+      ritaMsgs = ritaMsgs.filter(m => !m.isPrivate);
+      snap.forEach(child => { 
+        let v = child.val(); v.isPrivate = true; ritaMsgs.push(v); 
+      });
+      updateRitaUI();
     });
 
-    // Rita can see all public wishes being sent into the Database securely here too
     db.ref("inbox").on('value', snap => {
-       console.log("Rita live public wishes count:", Object.keys(snap.val() || {}).length);
+      ritaMsgs = ritaMsgs.filter(m => m.isPrivate);
+      snap.forEach(child => {
+        let v = child.val(); v.isPrivate = false; ritaMsgs.push(v);
+      });
+      updateRitaUI();
     });
   }
 
