@@ -56,48 +56,48 @@
 
   <!-- Firebase Integration Script -->
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
   <script>
-    // Paste your Firebase Config here once created via Firebase Console!
     const firebaseConfig = {
       apiKey: "AIzaSyDu-K4FV_oAJokEx7d_SX0DxQN6pCb6fuY",
       authDomain: "rita-9c659.firebaseapp.com",
+      databaseURL: "https://rita-9c659-default-rtdb.firebaseio.com",
       projectId: "rita-9c659",
       storageBucket: "rita-9c659.firebasestorage.app",
       messagingSenderId: "817583671159",
-      appId: "1:817583671159:web:b77eb0643275692b330372",
-      measurementId: "G-23NDRLLHKN"
+      appId: "1:817583671159:web:b77eb0643275692b330372"
     };
     
-    // Auto-init only if user replaced placeholder
-    if(firebaseConfig.apiKey !== "YOUR_API_KEY") {
-      firebase.initializeApp(firebaseConfig);
-      const db = firebase.firestore();
-      
-      // Auto-load messages & chat
-      db.collection("inbox").onSnapshot(snap => {
-        document.getElementById("inbox").innerHTML = snap.docs.map(d => `<div class="msg"><span>${d.data().sender}</span>: ${d.data().text}</div>`).join("");
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+    
+    db.ref("inbox").on('value', snap => {
+      let html = "";
+      snap.forEach(child => { 
+        html += `<div class="msg"><span>${child.val().sender}</span>: ${child.val().text}</div>`; 
       });
-      db.collection("privateChat").orderBy("timestamp").onSnapshot(snap => {
-        document.getElementById("private-chat").innerHTML = snap.docs.map(d => `<div class="msg"><span>${d.data().sender}</span>: ${d.data().text}</div>`).join("");
+      document.getElementById("inbox").innerHTML = html;
+    });
+    
+    db.ref("privateChat").orderByChild("timestamp").on('value', snap => {
+      let html = "";
+      snap.forEach(child => { 
+        html += `<div class="msg"><span>${child.val().sender}</span>: ${child.val().text}</div>`; 
       });
-    }
+      document.getElementById("private-chat").innerHTML = html;
+    });
 
     function saveContent() {
-      if(firebaseConfig.apiKey === "YOUR_API_KEY") return alert("Connect Firebase first!");
-      firebase.firestore().collection("config").doc("site").set({
+      db.ref("config/site").set({
         title: document.getElementById("title-text").value,
         color: document.getElementById("primary-color").value
       }).then(() => alert("Content Saved!"));
     }
 
     function sendPrivateMsg() {
-      if(firebaseConfig.apiKey === "YOUR_API_KEY") return alert("Connect Firebase first!");
       const txt = document.getElementById("chat-input").value;
       if(!txt) return;
-      firebase.firestore().collection("privateChat").add({
-        sender: "Admin", text: txt, timestamp: Date.now()
-      });
+      db.ref("privateChat").push({ sender: "Admin", text: txt, timestamp: Date.now() });
       document.getElementById("chat-input").value = "";
     }
   </script>

@@ -1351,7 +1351,7 @@
 </div>
 
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 <script>
 // ═══════════════════════════════════════
 //  FIREBASE INIT
@@ -1359,13 +1359,14 @@
 firebase.initializeApp({
   apiKey: "AIzaSyDu-K4FV_oAJokEx7d_SX0DxQN6pCb6fuY",
   authDomain: "rita-9c659.firebaseapp.com",
+  databaseURL: "https://rita-9c659-default-rtdb.firebaseio.com",
   projectId: "rita-9c659",
   storageBucket: "rita-9c659.firebasestorage.app",
   messagingSenderId: "817583671159",
   appId: "1:817583671159:web:b77eb0643275692b330372",
   measurementId: "G-23NDRLLHKN"
 });
-const db = firebase.firestore();
+const db = firebase.database();
 
 // ═══════════════════════════════════════
 //  STATE
@@ -1461,14 +1462,17 @@ const isRitaMode = urlParams.get('auth') === 'rita';
 window.sendRitaPrivateReply = () => {
   const t = document.getElementById('rita-reply-text').value.trim();
   if(!t) return;
-  db.collection("privateChat").add({ sender: "Rita's Room", text: t, timestamp: Date.now() });
+  db.ref("privateChat").push({ sender: "Rita's Room", text: t, timestamp: Date.now() });
   document.getElementById('rita-reply-text').value = '';
 };
 
 window.onload = () => {
-  db.collection("config").doc("site").onSnapshot(doc => {
-    if(doc.exists && doc.data().title) document.querySelector('.main-title').textContent = doc.data().title;
-    if(doc.exists && doc.data().color) document.documentElement.style.setProperty('--gold', doc.data().color);
+  db.ref("config/site").on('value', snap => {
+    if(snap.exists()) {
+      const data = snap.val();
+      if(data.title) document.querySelector('.main-title').textContent = data.title;
+      if(data.color) document.documentElement.style.setProperty('--gold', data.color);
+    }
   });
 
   if (isRitaMode) {
@@ -1486,18 +1490,23 @@ window.onload = () => {
       </div>
     `;
 
-    db.collection("privateChat").orderBy("timestamp").onSnapshot(snap => {
-      const msgs = snap.docs.map(d => `<div class="message-card"><div class="message-from">${d.data().sender}</div><div class="message-text">"${d.data().text}"</div></div>`).join("");
+    db.ref("privateChat").orderByChild("timestamp").on('value', snap => {
+      let msgs = "";
+      let count = 0;
+      snap.forEach(child => {
+        msgs += `<div class="message-card"><div class="message-from">${child.val().sender}</div><div class="message-text">"${child.val().text}"</div></div>`;
+        count++;
+      });
       document.getElementById('message-list').innerHTML = msgs || '<div class="empty-inbox">No secret chats yet...</div>';
-      if(snap.docs.length > 0) {
+      if(count > 0) {
         document.getElementById('chat-badge').style.display = 'flex';
-        document.getElementById('chat-badge').textContent = snap.docs.length;
+        document.getElementById('chat-badge').textContent = count;
       }
     });
 
     // Rita can see all public wishes being sent into the Database securely here too
-    db.collection("inbox").orderBy("timestamp").onSnapshot(snap => {
-       console.log("Rita live public wishes count:", snap.docs.length);
+    db.ref("inbox").on('value', snap => {
+       console.log("Rita live public wishes count:", Object.keys(snap.val() || {}).length);
     });
   }
 
@@ -1770,7 +1779,7 @@ function sendMessage() {
   const from = anonOn ? 'Anonymous ✨' : (document.getElementById('sender-name').value || 'A Friend');
 
   // Broadcast to Firebase safely
-  db.collection("inbox").add({ sender: from, text: text, timestamp: Date.now() });
+  db.ref("inbox").push({ sender: from, text: text, timestamp: Date.now() });
 
   messages.push({ from, text });
   renderMessages();
