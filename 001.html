@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CMS Dashboard | 001</title>
+  <style>
+    :root {
+      --dark: #0f0a0d; border-radius: 8px; font-family: sans-serif;
+      --gold: #f0c060; --white: #fff;
+    }
+    body { background: var(--dark); color: var(--white); margin: 0; padding: 20px; font-family: system-ui, sans-serif; }
+    h1 { color: var(--gold); }
+    .card { background: rgba(255,255,255,0.05); padding: 20px; border-radius: 12px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.1); }
+    input, textarea { width: 100%; padding: 10px; margin: 8px 0; background: rgba(0,0,0,0.5); border: 1px solid #333; color: white; border-radius: 4px;}
+    button { padding: 10px 20px; background: var(--gold); color: black; border: none; cursor: pointer; border-radius: 4px; font-weight: bold;}
+    .chat-box { height: 200px; overflow-y: auto; background: #000; padding: 10px; border: 1px solid #333; margin-bottom: 10px; }
+    .msg { margin-bottom: 8px; }
+    .msg span { color: var(--gold); font-size: 0.8em; text-transform: uppercase; }
+  </style>
+  <script>
+    if(prompt("Enter Admin Access Code:") !== "admin123") {
+      document.documentElement.innerHTML = "<h1>❌ Access Denied</h1>";
+    }
+  </script>
+</head>
+<body>
+
+  <h1>CMS Dashboard</h1>
+  <p>Manage Rita's website from here. (Database connection pending setup)</p>
+
+  <div class="card">
+    <h3>1. Website Content</h3>
+    <label>Main Title</label>
+    <input type="text" id="title-text" value="Happy Birthday">
+    <label>Primary Text Color</label>
+    <input type="color" id="primary-color" value="#f0c060">
+    <button onclick="saveContent()">Save Content</button>
+  </div>
+
+  <div class="card">
+    <h3>2. Guest Messages (Inbox)</h3>
+    <div class="chat-box" id="inbox">
+      <!-- Database messages go here -->
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>3. Private Chat with Rita</h3>
+    <div class="chat-box" id="private-chat">
+      <!-- Private messages go here -->
+    </div>
+    <input type="text" id="chat-input" placeholder="Type a message to Rita...">
+    <button onclick="sendPrivateMsg()">Send to Rita</button>
+  </div>
+
+  <!-- Firebase Integration Script -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+  <script>
+    // Paste your Firebase Config here once created via Firebase Console!
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT.firebaseapp.com",
+      projectId: "YOUR_PROJECT",
+      storageBucket: "YOUR_PROJECT.appspot.com"
+    };
+    
+    // Auto-init only if user replaced placeholder
+    if(firebaseConfig.apiKey !== "YOUR_API_KEY") {
+      firebase.initializeApp(firebaseConfig);
+      const db = firebase.firestore();
+      
+      // Auto-load messages & chat
+      db.collection("inbox").onSnapshot(snap => {
+        document.getElementById("inbox").innerHTML = snap.docs.map(d => `<div class="msg"><span>${d.data().sender}</span>: ${d.data().text}</div>`).join("");
+      });
+      db.collection("privateChat").orderBy("timestamp").onSnapshot(snap => {
+        document.getElementById("private-chat").innerHTML = snap.docs.map(d => `<div class="msg"><span>${d.data().sender}</span>: ${d.data().text}</div>`).join("");
+      });
+    }
+
+    function saveContent() {
+      if(firebaseConfig.apiKey === "YOUR_API_KEY") return alert("Connect Firebase first!");
+      firebase.firestore().collection("config").doc("site").set({
+        title: document.getElementById("title-text").value,
+        color: document.getElementById("primary-color").value
+      }).then(() => alert("Content Saved!"));
+    }
+
+    function sendPrivateMsg() {
+      if(firebaseConfig.apiKey === "YOUR_API_KEY") return alert("Connect Firebase first!");
+      const txt = document.getElementById("chat-input").value;
+      if(!txt) return;
+      firebase.firestore().collection("privateChat").add({
+        sender: "Admin", text: txt, timestamp: Date.now()
+      });
+      document.getElementById("chat-input").value = "";
+    }
+  </script>
+</body>
+</html>

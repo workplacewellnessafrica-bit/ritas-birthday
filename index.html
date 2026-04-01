@@ -1049,13 +1049,8 @@
     .card-inner { height: 360px; }
     .modal { padding: 28px 20px; }
   }
-  .hero-slanted-image {
+  .hero-polaroid {
     position: absolute;
-    top: 45%; 
-    right: 15%; 
-    transform: translateY(-50%) rotate(12deg);
-    width: 280px;
-    height: 350px;
     object-fit: cover;
     border-radius: 4px;
     border: 12px solid #fff;
@@ -1063,29 +1058,51 @@
     box-shadow: 0 30px 60px rgba(0,0,0,0.5);
     z-index: 1; 
     opacity: 0;
-    animation: floatInSlanted 1.2s 0.8s forwards;
     pointer-events: none;
   }
-
-  @keyframes floatInSlanted {
+  
+  .hp-1 {
+    width: 280px; height: 350px;
+    top: 45%; right: 15%; 
+    animation: fp1 1.2s 0.8s forwards;
+  }
+  @keyframes fp1 {
     from { opacity: 0; transform: translateY(-40%) rotate(0deg) scale(0.9); }
     to { opacity: 1; transform: translateY(-50%) rotate(12deg) scale(1); }
   }
 
+  .hp-2 {
+    width: 200px; height: 240px;
+    top: 20%; left: 10%; 
+    animation: fp2 1.4s 1.1s forwards;
+    z-index: 0;
+  }
+  @keyframes fp2 {
+    from { opacity: 0; transform: translateY(-20%) rotate(-10deg) scale(0.9); }
+    to { opacity: 0.8; transform: translateY(-30%) rotate(-25deg) scale(1); }
+  }
+
+  .hp-3 {
+    width: 180px; height: 220px;
+    bottom: 10%; left: 20%; 
+    animation: fp3 1.5s 1.3s forwards;
+    z-index: 2;
+  }
+  @keyframes fp3 {
+    from { opacity: 0; transform: rotate(0deg) scale(0.8); }
+    to { opacity: 0.9; transform: rotate(15deg) scale(1); }
+  }
+
   @media (max-width: 800px) {
-    .hero-slanted-image {
-      right: 50%;
-      top: 25%;
-      width: 220px;
-      height: 280px;
-      transform: translate(50%, -50%) rotate(8deg);
-      opacity: 0.3;
-      z-index: 0;
+    .hp-1 {
+      right: 50%; top: 25%; width: 220px; height: 280px;
+      animation: fp1m 1.2s 0.8s forwards;
     }
-    @keyframes floatInSlanted {
+    @keyframes fp1m {
       from { opacity: 0; transform: translate(50%, -40%) rotate(0deg) scale(0.9); }
       to { opacity: 0.3; transform: translate(50%, -50%) rotate(8deg) scale(1); }
     }
+    .hp-2, .hp-3 { display: none; }
   }
 </style>
 </head>
@@ -1104,12 +1121,15 @@
 
 <!-- NAV -->
 <nav>
-  <div class="nav-logo">Rita's Birthday</div>
+  <div class="nav-logo">
+    Rita's Birthday
+    <span id="rita-badge" style="display:none;font-size:0.6rem;background:var(--rose);padding:3px 8px;border-radius:12px;margin-left:10px;vertical-align:middle;">RITA'S VIEW</span>
+  </div>
   <div class="nav-icons">
     <button class="nav-icon-btn" onclick="openModal('share-modal')" title="Share">
       🔗
     </button>
-    <button class="nav-icon-btn" onclick="openModal('chat-modal')" title="Rita's inbox" id="chat-nav-btn">
+    <button class="nav-icon-btn" onclick="openModal('chat-modal')" title="Private Inbox" id="chat-nav-btn">
       💌
       <span class="chat-badge" id="chat-badge">0</span>
     </button>
@@ -1121,9 +1141,11 @@
   <div class="landing-bg"></div>
   <div class="film-grain"></div>
   <div class="sparkle-ring"></div>
-  <div class="sparkle-ring"></div>
 
-  <img src="assets/r3.jpeg" class="hero-slanted-image" alt="Rita" />
+  <!-- Collage Cluster -->
+  <img src="assets/r3.jpeg" class="hero-polaroid hp-1" alt="Rita 1" />
+  <img src="assets/r1.jpeg" class="hero-polaroid hp-2" alt="Rita 2" />
+  <img src="assets/r5.jpeg" class="hero-polaroid hp-3" alt="Rita 3" />
 
   <div class="landing-content">
     <div class="pre-title">✦ A Special Day For A Special Soul ✦</div>
@@ -1328,7 +1350,23 @@
   </div>
 </div>
 
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 <script>
+// ═══════════════════════════════════════
+//  FIREBASE INIT
+// ═══════════════════════════════════════
+firebase.initializeApp({
+  apiKey: "AIzaSyDu-K4FV_oAJokEx7d_SX0DxQN6pCb6fuY",
+  authDomain: "rita-9c659.firebaseapp.com",
+  projectId: "rita-9c659",
+  storageBucket: "rita-9c659.firebasestorage.app",
+  messagingSenderId: "817583671159",
+  appId: "1:817583671159:web:b77eb0643275692b330372",
+  measurementId: "G-23NDRLLHKN"
+});
+const db = firebase.firestore();
+
 // ═══════════════════════════════════════
 //  STATE
 // ═══════════════════════════════════════
@@ -1416,10 +1454,56 @@ const SAMPLE_CARDS = [
 let bgMusic = null;
 let musicWasPlaying = false;
 
+// State for Rita Auth
+const urlParams = new URLSearchParams(window.location.search);
+const isRitaMode = urlParams.get('auth') === 'rita';
+
+window.sendRitaPrivateReply = () => {
+  const t = document.getElementById('rita-reply-text').value.trim();
+  if(!t) return;
+  db.collection("privateChat").add({ sender: "Rita's Room", text: t, timestamp: Date.now() });
+  document.getElementById('rita-reply-text').value = '';
+};
+
 window.onload = () => {
+  db.collection("config").doc("site").onSnapshot(doc => {
+    if(doc.exists && doc.data().title) document.querySelector('.main-title').textContent = doc.data().title;
+    if(doc.exists && doc.data().color) document.documentElement.style.setProperty('--gold', doc.data().color);
+  });
+
+  if (isRitaMode) {
+    document.getElementById('rita-badge').style.display = 'inline-block';
+    
+    // Inject Private Chat securely
+    const cmodal = document.getElementById('chat-modal').querySelector('.modal');
+    const oldBtn = cmodal.querySelector('button.btn-full-rose');
+    if (oldBtn) oldBtn.remove();
+    
+    cmodal.innerHTML += `
+      <div style="margin-top:20px; border-top:1px solid rgba(255,255,255,0.1); padding-top:20px;">
+        <input type="text" id="rita-reply-text" class="form-input" placeholder="Message Admin privately..." />
+        <button class="btn-full btn-full-gold" onclick="sendRitaPrivateReply()" style="margin-top:10px;">Send Securely</button>
+      </div>
+    `;
+
+    db.collection("privateChat").orderBy("timestamp").onSnapshot(snap => {
+      const msgs = snap.docs.map(d => `<div class="message-card"><div class="message-from">${d.data().sender}</div><div class="message-text">"${d.data().text}"</div></div>`).join("");
+      document.getElementById('message-list').innerHTML = msgs || '<div class="empty-inbox">No secret chats yet...</div>';
+      if(snap.docs.length > 0) {
+        document.getElementById('chat-badge').style.display = 'flex';
+        document.getElementById('chat-badge').textContent = snap.docs.length;
+      }
+    });
+
+    // Rita can see all public wishes being sent into the Database securely here too
+    db.collection("inbox").orderBy("timestamp").onSnapshot(snap => {
+       console.log("Rita live public wishes count:", snap.docs.length);
+    });
+  }
+
   bgMusic = document.getElementById('bg-music');
   
-  bgMusic.addEventListener('timeupdate', () => {
+  if(bgMusic) bgMusic.addEventListener('timeupdate', () => {
     songProgress = (bgMusic.currentTime / bgMusic.duration) * 100 || 0;
     document.getElementById('song-progress-fill').style.width = songProgress + '%';
   });
@@ -1684,6 +1768,9 @@ function sendMessage() {
   if (!text) { showToast('Write something for Rita first! 💌'); return; }
 
   const from = anonOn ? 'Anonymous ✨' : (document.getElementById('sender-name').value || 'A Friend');
+
+  // Broadcast to Firebase safely
+  db.collection("inbox").add({ sender: from, text: text, timestamp: Date.now() });
 
   messages.push({ from, text });
   renderMessages();
