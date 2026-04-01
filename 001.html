@@ -12,90 +12,188 @@
     body { background: var(--dark); color: var(--white); margin: 0; padding: 20px; font-family: system-ui, sans-serif; }
     h1 { color: var(--gold); }
     .card { background: rgba(255,255,255,0.05); padding: 20px; border-radius: 12px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.1); }
-    input, textarea { width: 100%; padding: 10px; margin: 8px 0; background: rgba(0,0,0,0.5); border: 1px solid #333; color: white; border-radius: 4px;}
+    input, textarea { width: 100%; padding: 10px; margin: 8px 0; background: rgba(0,0,0,0.5); border: 1px solid #333; color: white; border-radius: 4px; box-sizing: border-box;}
     button { padding: 10px 20px; background: var(--gold); color: black; border: none; cursor: pointer; border-radius: 4px; font-weight: bold;}
+    button.btn-danger { background: #d9534f; color: white; }
     .chat-box { height: 200px; overflow-y: auto; background: #000; padding: 10px; border: 1px solid #333; margin-bottom: 10px; }
     .msg { margin-bottom: 8px; }
     .msg span { color: var(--gold); font-size: 0.8em; text-transform: uppercase; }
+    .gal-row { display: flex; align-items: center; justify-content: space-between; background: rgba(0,0,0,0.4); padding: 10px; margin-bottom: 10px; border-radius: 5px;}
+    .gal-thumb { width: 60px; height: 60px; object-fit: cover; border-radius: 4px; margin-right: 15px;}
+    .gal-info { flex: 1; margin-right: 15px; }
+    .gal-info input { margin: 0; }
   </style>
   <script>
     if(prompt("Enter Admin Access Code:") !== "admin123") {
       document.documentElement.innerHTML = "<h1>❌ Access Denied</h1>";
+      throw new Error("Access Denied");
     }
   </script>
 </head>
 <body>
 
   <h1>CMS Dashboard</h1>
-  <p>Manage Rita's website from here. (Database connection pending setup)</p>
 
   <div class="card">
     <h3>1. Website Content</h3>
-    <label>Main Title</label>
-    <input type="text" id="title-text" value="Happy Birthday">
-    <label>Primary Text Color</label>
-    <input type="color" id="primary-color" value="#f0c060">
-    <button onclick="saveContent()">Save Content</button>
+    <label>Nav Bar Title</label><input type="text" id="cfg-nav">
+    <label>Pre-Title</label><input type="text" id="cfg-pre">
+    <label>Main Title</label><input type="text" id="cfg-main">
+    <label>Sub-Title</label><input type="text" id="cfg-sub">
+    <label>Primary Text Color</label><input type="color" id="cfg-color">
+    <br><br>
+    <button onclick="saveConfig()">Save Content Configuration</button>
   </div>
 
   <div class="card">
-    <h3>2. Guest Messages (Inbox)</h3>
-    <div class="chat-box" id="inbox">
-      <!-- Database messages go here -->
+    <h3>2. Gallery Manager</h3>
+    
+    <div style="background:rgba(0,0,0,0.5); padding:15px; border-radius:8px; margin-bottom: 20px;">
+      <h4>Create New Memory</h4>
+      <label>Caption / Text</label><input type="text" id="gal-txt" placeholder="A beautiful moment...">
+      <label>Image/Video File Path (e.g. "assets/r1.jpeg") or URL</label>
+      <input type="text" id="gal-file-url" placeholder="assets/new-image.jpg or https://...">
+      <label>Is this a video?</label>
+      <input type="checkbox" id="gal-is-video" style="width:auto; margin-bottom:10px;"> Yes
+      <br>
+      <button onclick="addGalleryItem()" id="upload-btn">Add to Gallery</button>
+      <div id="upload-status" style="color:var(--gold); margin-top:5px; font-size:12px;"></div>
+    </div>
+
+    <h4>Live Gallery Elements</h4>
+    <div id="gallery-list">
+      <!-- Generated rows -->
     </div>
   </div>
 
   <div class="card">
-    <h3>3. Private Chat with Rita</h3>
-    <div class="chat-box" id="private-chat">
-      <!-- Private messages go here -->
-    </div>
+    <h3>3. Guest Messages (Public Inbox)</h3>
+    <div class="chat-box" id="inbox"></div>
+  </div>
+
+  <div class="card">
+    <h3>4. Private Chat with Rita</h3>
+    <div class="chat-box" id="private-chat"></div>
     <input type="text" id="chat-input" placeholder="Type a message to Rita...">
-    <button onclick="sendPrivateMsg()">Send to Rita</button>
+    <button onclick="sendPrivateMsg()">Send Securely</button>
   </div>
+
 
   <!-- Firebase Integration Script -->
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
   <script>
-    // Paste your Firebase Config here once created via Firebase Console!
     const firebaseConfig = {
-      apiKey: "YOUR_API_KEY",
-      authDomain: "YOUR_PROJECT.firebaseapp.com",
-      projectId: "YOUR_PROJECT",
-      storageBucket: "YOUR_PROJECT.appspot.com"
+      apiKey: "AIzaSyDu-K4FV_oAJokEx7d_SX0DxQN6pCb6fuY",
+      authDomain: "rita-9c659.firebaseapp.com",
+      databaseURL: "https://rita-9c659-default-rtdb.firebaseio.com",
+      projectId: "rita-9c659",
+      storageBucket: "rita-9c659.firebasestorage.app",
+      messagingSenderId: "817583671159",
+      appId: "1:817583671159:web:b77eb0643275692b330372"
     };
     
-    // Auto-init only if user replaced placeholder
-    if(firebaseConfig.apiKey !== "YOUR_API_KEY") {
-      firebase.initializeApp(firebaseConfig);
-      const db = firebase.firestore();
-      
-      // Auto-load messages & chat
-      db.collection("inbox").onSnapshot(snap => {
-        document.getElementById("inbox").innerHTML = snap.docs.map(d => `<div class="msg"><span>${d.data().sender}</span>: ${d.data().text}</div>`).join("");
-      });
-      db.collection("privateChat").orderBy("timestamp").onSnapshot(snap => {
-        document.getElementById("private-chat").innerHTML = snap.docs.map(d => `<div class="msg"><span>${d.data().sender}</span>: ${d.data().text}</div>`).join("");
-      });
-    }
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+    
+    // --- LOAD CONFIG ---
+    db.ref("config/site").on('value', snap => {
+      if(snap.exists()){
+        const d = snap.val();
+        document.getElementById("cfg-nav").value = d.nav || "Rita's Birthday";
+        document.getElementById("cfg-pre").value = d.preTitle || "✦ A Special Day For A Special Soul ✦";
+        document.getElementById("cfg-main").value = d.mainTitle || "Happy Birthday";
+        document.getElementById("cfg-sub").value = d.subTitle || "Press start to begin the journey";
+        document.getElementById("cfg-color").value = d.color || "#f0c060";
+      }
+    });
 
-    function saveContent() {
-      if(firebaseConfig.apiKey === "YOUR_API_KEY") return alert("Connect Firebase first!");
-      firebase.firestore().collection("config").doc("site").set({
-        title: document.getElementById("title-text").value,
-        color: document.getElementById("primary-color").value
-      }).then(() => alert("Content Saved!"));
+    // --- LOAD MESSAGES ---
+    db.ref("inbox").on('value', snap => {
+      let html = "";
+      snap.forEach(child => { html += `<div class="msg"><span>${child.val().sender}</span>: ${child.val().text}</div>`; });
+      document.getElementById("inbox").innerHTML = html;
+    });
+    
+    db.ref("privateChat").orderByChild("timestamp").on('value', snap => {
+      let html = "";
+      snap.forEach(child => { html += `<div class="msg"><span>${child.val().sender}</span>: ${child.val().text}</div>`; });
+      document.getElementById("private-chat").innerHTML = html;
+    });
+
+    // --- LOAD GALLERY ---
+    db.ref("gallery").on('value', snap => {
+      let html = "";
+      snap.forEach(child => {
+        const id = child.key;
+        const v = child.val();
+        const mediaTag = v.isVideo ? `<video class="gal-thumb" src="${v.image}" muted></video>` : `<img class="gal-thumb" src="${v.image}">`;
+        html += `
+          <div class="gal-row" id="gal-${id}">
+            ${mediaTag}
+            <div class="gal-info">
+              <input type="text" id="cap-${id}" value="${v.text}">
+            </div>
+            <div>
+              <button onclick="updateCaption('${id}')">Save Caption</button>
+              <button class="btn-danger" onclick="deleteGallery('${id}')">Delete</button>
+            </div>
+          </div>
+        `;
+      });
+      document.getElementById("gallery-list").innerHTML = html || "<p>Gallery is empty.</p>";
+    });
+
+    // --- FUNCTIONS ---
+    function saveConfig() {
+      db.ref("config/site").set({
+        nav: document.getElementById("cfg-nav").value,
+        preTitle: document.getElementById("cfg-pre").value,
+        mainTitle: document.getElementById("cfg-main").value,
+        subTitle: document.getElementById("cfg-sub").value,
+        color: document.getElementById("cfg-color").value
+      }).then(() => alert("Content saved!"));
     }
 
     function sendPrivateMsg() {
-      if(firebaseConfig.apiKey === "YOUR_API_KEY") return alert("Connect Firebase first!");
       const txt = document.getElementById("chat-input").value;
       if(!txt) return;
-      firebase.firestore().collection("privateChat").add({
-        sender: "Admin", text: txt, timestamp: Date.now()
-      });
+      db.ref("privateChat").push({ sender: "Admin", text: txt, timestamp: Date.now() });
       document.getElementById("chat-input").value = "";
+    }
+
+    // GALLERY FUNCTIONS
+    window.updateCaption = function(id) {
+      const newText = document.getElementById("cap-" + id).value;
+      db.ref("gallery/" + id).update({ text: newText }).then(() => alert("Caption Updated!"));
+    }
+
+    window.deleteGallery = function(id) {
+      if(confirm("Delete this memory completely?")) {
+        db.ref("gallery/" + id).remove();
+      }
+    }
+
+    window.addGalleryItem = function() {
+      const urlVal = document.getElementById("gal-file-url").value.trim();
+      const textVal = document.getElementById("gal-txt").value.trim();
+      const isVideo = document.getElementById("gal-is-video").checked;
+      const status = document.getElementById("upload-status");
+      
+      if(!urlVal) return alert("Enter a file path or URL first!");
+      if(!textVal) return alert("Enter a caption first!");
+
+      db.ref("gallery").push({
+        image: urlVal,
+        text: textVal,
+        isVideo: isVideo,
+        color: "#f0c060",
+        timestamp: Date.now()
+      }).then(() => {
+        status.innerText = "Added Successfully!";
+        document.getElementById("gal-file-url").value = "";
+        document.getElementById("gal-txt").value = "";
+      });
     }
   </script>
 </body>
