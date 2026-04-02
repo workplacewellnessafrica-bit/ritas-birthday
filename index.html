@@ -285,9 +285,10 @@
   #gallery {
     padding: 80px 0 100px;
     position: relative;
-    width: 100%;
-    max-width: 1500px; /* Further increased to use more left-side space */
-    margin: 0 auto;
+    width: 95%;
+    max-width: 1300px; /* Widened to fill the screen */
+    margin-left: 2% !important; /* Force shift towards the left */
+    margin-right: auto !important;
     overflow: visible;
   }
 
@@ -302,10 +303,10 @@
     display: grid !important;
     grid-template-columns: repeat(3, 1fr) !important;
     gap: 60px 0;
-    justify-items: center;
+    justify-items: center; 
     position: relative;
     z-index: 5;
-    padding: 40px 120px 40px 20px; /* Large right padding for FABs, small left padding to push left */
+    padding: 40px 180px 40px 0; /* Massive right padding to protect FAB labels */
     width: 100%;
     box-sizing: border-box;
   }
@@ -336,7 +337,7 @@
     cursor: pointer;
     transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     position: relative;
-    width: 200px; /* Tighter cards so 3 fit with balanced margins */
+    width: 190px; /* Balanced size for the wider grid */
     justify-self: center;
     aspect-ratio: 1 / 1.25;
     display: flex;
@@ -2071,10 +2072,16 @@ window.onload = () => {
   db.ref("config/site").on('value', snap => {
     if(snap.exists()) {
       const data = snap.val();
-      if(data.mainTitle || data.title) document.querySelector('.main-title').textContent = data.mainTitle || data.title;
+      const cleanBrand = (str) => str ? str.replace(/Ritahh/g, 'Ritah').replace(/Rita/g, 'Ritah') : '';
+      
+      if(data.mainTitle || data.title) {
+        document.querySelector('.main-title').textContent = cleanBrand(data.mainTitle || data.title);
+      }
       if(data.preTitle) document.querySelector('.pre-title').textContent = data.preTitle;
       if(data.subTitle) document.querySelector('.subtitle').textContent = data.subTitle;
-      if(data.nav) document.querySelector('.nav-logo').childNodes[0].textContent = data.nav + " ";
+      if(data.nav) {
+        document.querySelector('.nav-logo').childNodes[0].textContent = cleanBrand(data.nav) + " ";
+      }
       if(data.color) document.documentElement.style.setProperty('--gold', data.color);
     } else {
       // Setup literal defaults so a freshly connected empty database does not appear broken
