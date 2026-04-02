@@ -36,6 +36,19 @@ app.use(express.json());
 // API-only mode (frontend is on GitHub Pages)
 // Removed static file serving to avoid path issues on Railway
 
+// Multer — memory storage for Cloudinary streaming
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 25 * 1024 * 1024 }, // 25MB max
+  fileFilter: (req, file, cb) => {
+    const allowed = /jpeg|jpg|png|gif|webp|mp4|mov|avi|heic/;
+    const ext = path.extname(file.originalname).toLowerCase();
+    const mime = file.mimetype;
+    if (allowed.test(ext) || allowed.test(mime)) cb(null, true);
+    else cb(new Error('Only images and videos are allowed'));
+  },
+});
+
 // ── Root Route ──
 app.get('/', (req, res) => {
   res.send('🎂 Rita\'s Birthday API is Online! Use /api/health to check status.');
