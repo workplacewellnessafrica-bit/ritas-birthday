@@ -17,10 +17,13 @@ cloudinary.config({
 
 // ── Middleware ──
 app.use(cors({
-  origin: '*', // Allows all origins, including GitHub Pages
+  origin: '*', 
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
 }));
+
+// Force pre-flight OPTIONS to return 200
+app.options('*', cors());
 
 // Simple request logger
 app.use((req, res, next) => {
@@ -30,20 +33,12 @@ app.use((req, res, next) => {
 
 app.use(express.json());
 
-// Serve the frontend from the parent directory
-app.use(express.static(path.join(__dirname, '..')));
+// API-only mode (frontend is on GitHub Pages)
+// Removed static file serving to avoid path issues on Railway
 
-// Multer — memory storage for Cloudinary streaming
-const upload = multer({
-  storage: multer.memoryStorage(),
-  limits: { fileSize: 25 * 1024 * 1024 }, // 25MB max
-  fileFilter: (req, file, cb) => {
-    const allowed = /jpeg|jpg|png|gif|webp|mp4|mov|avi|heic/;
-    const ext = allowed.test(path.extname(file.originalname).toLowerCase());
-    const mime = allowed.test(file.mimetype);
-    if (ext || mime) cb(null, true);
-    else cb(new Error('Only images and videos are allowed'));
-  },
+// ── Root Route ──
+app.get('/', (req, res) => {
+  res.send('🎂 Rita\'s Birthday API is Online! Use /api/health to check status.');
 });
 
 // ── Upload Endpoint ──
@@ -136,11 +131,19 @@ app.post('/api/upload-song', upload.single('song'), async (req, res) => {
 
 // ── Health Check ──
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+  res.json({ 
+    status: 'ok', 
+    timestamp: new Date().toISOString(),
+    env: {
+      node_version: process.version,
+      port: PORT
+    }
+  });
 });
 
 // ── Start Server ──
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`🎂 Rita's Birthday Server running on port ${PORT}`);
+  console.log(`   Internal bind: 0.0.0.0:${PORT}`);
   console.log(`   Cloudinary: ${process.env.CLOUDINARY_CLOUD_NAME}`);
 });
