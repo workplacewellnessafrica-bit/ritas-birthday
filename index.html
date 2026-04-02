@@ -286,7 +286,7 @@
     padding: 80px 0 100px;
     position: relative;
     width: 100%;
-    max-width: 1300px; /* Increased to reduce outer gaps */
+    max-width: 1500px; /* Further increased to use more left-side space */
     margin: 0 auto;
     overflow: visible;
   }
@@ -305,7 +305,7 @@
     justify-items: center;
     position: relative;
     z-index: 5;
-    padding: 40px 60px 40px 20px; /* More padding on right for FABs, less on left */
+    padding: 40px 120px 40px 20px; /* Large right padding for FABs, small left padding to push left */
     width: 100%;
     box-sizing: border-box;
   }
@@ -466,10 +466,11 @@
     .gallery-track {
       grid-template-columns: repeat(1, 1fr) !important;
       gap: 40px;
-      padding: 20px 5%;
+      padding: 20px 20px; /* Simple centered padding for mobile */
     }
     .polaroid-card { 
-      width: 280px;
+      width: 90%; /* Fits all phone screens */
+      max-width: 320px;
       padding-bottom: 30px; 
     }
     .movie-credit-name { font-size: 0.9rem; }
