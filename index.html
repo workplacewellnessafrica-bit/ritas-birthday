@@ -283,9 +283,9 @@
 
   /* ── SNAKE GALLERY SECTION ── */
   #gallery {
-    padding: 80px 20px 100px;
+    padding: 80px 0 100px;
     position: relative;
-    max-width: 1000px;
+    width: 100%;
     margin: 0 auto;
     overflow: visible;
   }
@@ -300,11 +300,13 @@
   .gallery-track {
     display: grid !important;
     grid-template-columns: repeat(3, 1fr) !important;
-    gap: 60px 20px;
+    gap: 60px 0;
+    justify-items: center;
     position: relative;
     z-index: 5;
-    padding: 20px;
+    padding: 40px 5%;
     width: 100%;
+    box-sizing: border-box;
   }
 
   /* SVG Path Connector */
@@ -333,12 +335,13 @@
     cursor: pointer;
     transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     position: relative;
-    width: 100%;
+    width: 250px; /* Fixed width to ensure perfect centering in the 3-col grid */
+    justify-self: center; /* Double verify centering */
     aspect-ratio: 1 / 1.25;
     display: flex;
     flex-direction: column;
     border-radius: 2px;
-    border: 1px solid rgba(0,0,0,0.05); /* Subtle border instead of shadow */
+    border: 1px solid rgba(0,0,0,0.05);
   }
 
   .polaroid-card:hover {
@@ -358,6 +361,29 @@
   .polaroid-img {
     width: 100%; height: 100%;
     object-fit: cover;
+  }
+
+  /* NEW: Text-Only Polaroid Style */
+  .polaroid-text-card {
+    width: 100%; height: 100%;
+    background: #fdfdfd;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    text-align: center;
+    font-family: 'Dancing Script', cursive;
+    font-size: 1.2rem;
+    line-height: 1.4;
+    color: #444;
+    position: relative;
+  }
+
+  .polaroid-text-card::before {
+    content: "“";
+    position: absolute;
+    top: 10px; left: 10px;
+    font-size: 3rem; opacity: 0.1;
   }
 
   .polaroid-badge {
@@ -439,8 +465,12 @@
     .gallery-track {
       grid-template-columns: repeat(1, 1fr) !important;
       gap: 40px;
+      padding: 20px 5%;
     }
-    .polaroid-card { padding-bottom: 30px; }
+    .polaroid-card { 
+      width: 280px;
+      padding-bottom: 30px; 
+    }
     .movie-credit-name { font-size: 0.9rem; }
   }
 
@@ -2224,12 +2254,20 @@ function renderGallery() {
     // Uploader color accent
     el.style.borderColor = color;
     
+    const isVideo = card.isVideo;
+    const isImage = card.image && (card.image.startsWith('http') || card.image.startsWith('data:image'));
+    const isTextCard = !isVideo && !isImage;
+    
     el.innerHTML = `
       <div class="polaroid-badge" style="background:${color}">${i + 1}</div>
       <div class="polaroid-img-container">
-        ${card.isVideo 
+        ${isVideo 
           ? `<video src="${card.image}" class="polaroid-img" muted loop playsinline autoplay></video>`
-          : `<img src="${card.image || 'https://via.placeholder.com/400?text=✨'}" class="polaroid-img" alt="Memory" />`
+          : isImage
+            ? `<img src="${card.image}" class="polaroid-img" alt="Memory" />`
+            : `<div class="polaroid-text-card">
+                 <div style="font-size:0.9rem; line-height:1.2;">"${card.text || card.caption || 'Special Wish'}"</div>
+               </div>`
         }
       </div>
       <div class="polaroid-footer">
@@ -2478,16 +2516,24 @@ function updateCinemaContent() {
     v.className = 'cinema-content';
     v.loop = true; v.playsInline = true;
     v.autoplay = true;
-    // Mute video if dedication song exists
     v.muted = (card.uploaderSong ? true : false);
     container.appendChild(v);
-  } else if (card.image) {
+  } else if (card.image && (card.image.startsWith('http') || card.image.startsWith('data:image'))) {
     const img = document.createElement('img');
     img.src = card.image;
     img.className = 'cinema-content';
     container.appendChild(img);
   } else {
-    container.innerHTML = `<div style="font-size:10rem;">${card.emoji || '✨'}</div>`;
+    // TEXT-ONLY CINEMA VIEW
+    container.innerHTML = `
+      <div style="color:white; text-align:center; padding:60px; max-width:600px;">
+        <div style="font-size:4rem; margin-bottom:20px; opacity:0.3;">“</div>
+        <div style="font-family:'Dancing Script',cursive; font-size:2.5rem; line-height:1.4; color:var(--gold);">
+          ${card.text || card.caption || 'Happy Birthday Ritah!'}
+        </div>
+        <div style="font-size:4rem; margin-top:20px; text-align:right; opacity:0.3;">”</div>
+      </div>
+    `;
   }
 }
 
