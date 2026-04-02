@@ -286,6 +286,7 @@
     padding: 80px 0 100px;
     position: relative;
     width: 100%;
+    max-width: 900px;
     margin: 0 auto;
     overflow: visible;
   }
@@ -304,7 +305,7 @@
     justify-items: center;
     position: relative;
     z-index: 5;
-    padding: 40px 5%;
+    padding: 40px 40px; /* balanced left/right padding */
     width: 100%;
     box-sizing: border-box;
   }
@@ -335,8 +336,8 @@
     cursor: pointer;
     transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     position: relative;
-    width: 250px; /* Fixed width to ensure perfect centering in the 3-col grid */
-    justify-self: center; /* Double verify centering */
+    width: 200px; /* Tighter cards so 3 fit with balanced margins */
+    justify-self: center;
     aspect-ratio: 1 / 1.25;
     display: flex;
     flex-direction: column;
@@ -2255,15 +2256,14 @@ function renderGallery() {
     el.style.borderColor = color;
     
     const isVideo = card.isVideo;
-    const isImage = card.image && (card.image.startsWith('http') || card.image.startsWith('data:image'));
-    const isTextCard = !isVideo && !isImage;
+    const isTextCard = !card.image && !card.isVideo;
     
     el.innerHTML = `
       <div class="polaroid-badge" style="background:${color}">${i + 1}</div>
       <div class="polaroid-img-container">
         ${isVideo 
           ? `<video src="${card.image}" class="polaroid-img" muted loop playsinline autoplay></video>`
-          : isImage
+          : !isTextCard
             ? `<img src="${card.image}" class="polaroid-img" alt="Memory" />`
             : `<div class="polaroid-text-card">
                  <div style="font-size:0.9rem; line-height:1.2;">"${card.text || card.caption || 'Special Wish'}"</div>
@@ -2518,7 +2518,7 @@ function updateCinemaContent() {
     v.autoplay = true;
     v.muted = (card.uploaderSong ? true : false);
     container.appendChild(v);
-  } else if (card.image && (card.image.startsWith('http') || card.image.startsWith('data:image'))) {
+  } else if (card.image) {
     const img = document.createElement('img');
     img.src = card.image;
     img.className = 'cinema-content';
