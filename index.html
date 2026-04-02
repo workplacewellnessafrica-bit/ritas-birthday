@@ -298,12 +298,13 @@
   }
 
   .gallery-track {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 40px 20px;
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 60px 20px;
     position: relative;
     z-index: 5;
     padding: 20px;
+    width: 100%;
   }
 
   /* SVG Path Connector */
@@ -384,12 +385,16 @@
 
   .movie-credit-name {
     font-family: 'Bangers', cursive;
-    font-size: 1.15rem;
-    letter-spacing: 1.5px;
+    font-size: 0.9rem;
+    letter-spacing: 1px;
     color: var(--dark);
     text-transform: uppercase;
     line-height: 1;
     margin-bottom: 2px;
+    width: 100%;
+    text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .movie-credit-caption {
@@ -432,8 +437,8 @@
 
   @media (max-width: 600px) {
     .gallery-track {
-      grid-template-columns: repeat(2, 1fr);
-      gap: 30px 10px;
+      grid-template-columns: repeat(1, 1fr) !important;
+      gap: 40px;
     }
     .polaroid-card { padding-bottom: 30px; }
     .movie-credit-name { font-size: 0.9rem; }
