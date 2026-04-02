@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Happy Birthday Rita 🎂</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500&family=Dancing+Script:wght@700&family=Permanent+Marker&family=Bangers&display=swap" rel="stylesheet">
 <style>
   :root {
     --gold: #f0c060;
@@ -281,10 +281,162 @@
     50% { transform: translateX(-50%) translateY(8px); }
   }
 
-  /* ── GALLERY SECTION ── */
+  /* ── SNAKE GALLERY SECTION ── */
   #gallery {
-    padding: 80px 20px 40px;
+    padding: 80px 20px 100px;
     position: relative;
+    max-width: 1000px;
+    margin: 0 auto;
+    overflow: visible;
+  }
+
+  .gallery-wrapper {
+    position: relative;
+    width: 100%;
+    overflow: visible;
+    margin-top: 40px;
+  }
+
+  .gallery-track {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 40px 20px;
+    position: relative;
+    z-index: 5;
+    padding: 20px;
+  }
+
+  /* SVG Path Connector */
+  #gallery-path-svg {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    z-index: 1;
+    overflow: visible;
+  }
+
+  .gallery-path-line {
+    fill: none;
+    stroke: rgba(240,192,96,0.25);
+    stroke-width: 4;
+    stroke-dasharray: 10 12;
+    stroke-linecap: round;
+  }
+
+  /* Polaroid Card Styling */
+  .polaroid-card {
+    background: #fff;
+    padding: 12px 12px 40px 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    cursor: pointer;
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1 / 1.25;
+    display: flex;
+    flex-direction: column;
+    border-radius: 2px;
+    border: 1px solid rgba(0,0,0,0.05); /* Subtle border instead of shadow */
+  }
+
+  .polaroid-card:hover {
+    transform: scale(1.05) translateY(-5px) !important;
+    z-index: 50;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+  }
+
+  .polaroid-img-container {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: #eee;
+    position: relative;
+  }
+
+  .polaroid-img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+  }
+
+  .polaroid-badge {
+    position: absolute;
+    top: -12px; left: -12px;
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    background: var(--gold);
+    color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.8rem;
+    font-weight: bold;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    z-index: 10;
+  }
+
+  .polaroid-footer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 60px;
+    padding-top: 10px;
+  }
+
+  .movie-credit-name {
+    font-family: 'Bangers', cursive;
+    font-size: 1.15rem;
+    letter-spacing: 1.5px;
+    color: var(--dark);
+    text-transform: uppercase;
+    line-height: 1;
+    margin-bottom: 2px;
+  }
+
+  .movie-credit-caption {
+    font-family: 'Dancing Script', cursive;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: rgba(0,0,0,0.5);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+  }
+
+  /* Uploader Key Header */
+  .uploader-key {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 30px;
+    padding: 10px;
+  }
+
+  .key-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Bangers', cursive;
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    opacity: 0.8;
+  }
+
+  .key-color {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+  }
+
+  @media (max-width: 600px) {
+    .gallery-track {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 30px 10px;
+    }
+    .polaroid-card { padding-bottom: 30px; }
+    .movie-credit-name { font-size: 0.9rem; }
   }
 
   .section-header {
@@ -1463,8 +1615,6 @@
   @media (max-width: 600px) {
     nav { padding: 14px 20px; }
     .fab-group { bottom: 90px; right: 16px; }
-    .gallery-track { padding: 0 calc(50vw - 150px); }
-    .gallery-card { width: 280px; }
     .card-inner { height: 360px; }
     .modal { padding: 28px 20px; }
   }
@@ -1562,9 +1712,9 @@
   <div class="sparkle-ring"></div>
 
   <!-- Collage Cluster -->
-  <img src="assets/r3.jpeg" class="hero-polaroid hp-1" alt="Rita 1" />
-  <img src="assets/r1.jpeg" class="hero-polaroid hp-2" alt="Rita 2" />
-  <img src="assets/r5.jpeg" class="hero-polaroid hp-3" alt="Rita 3" />
+  <img src="assets/r3.jpeg" class="hero-polaroid hp-1" alt="Ritah 1" />
+  <img src="assets/r1.jpeg" class="hero-polaroid hp-2" alt="Ritah 2" />
+  <img src="assets/r5.jpeg" class="hero-polaroid hp-3" alt="Ritah 3" />
 
   <div class="landing-content">
     <div class="pre-title">✦ A Special Day For A Special Soul ✦</div>
@@ -1591,22 +1741,22 @@
 <!-- ═══════════ GALLERY ═══════════ -->
 <section id="gallery">
   <div class="section-header">
-    <div class="section-label">✦ The Memories ✦</div>
-    <h2 class="section-title">Swipe through the love</h2>
+    <div class="section-label">✦ The Journey ✦</div>
+    <h2 class="section-title">A path of beautiful memories</h2>
+  </div>
+
+  <div class="uploader-key" id="uploader-key" style="margin-bottom: 50px;">
+    <!-- Generated by JS -->
   </div>
 
   <div class="gallery-wrapper">
+    <svg id="gallery-path-svg">
+      <path class="gallery-path-line" id="gallery-path-line" d=""></path>
+    </svg>
     <div class="gallery-track" id="gallery-track">
       <!-- Cards injected by JS -->
     </div>
   </div>
-
-  <div class="gallery-nav">
-    <button class="gallery-btn" onclick="slideGallery(-1)">←</button>
-    <button class="gallery-btn" onclick="slideGallery(1)">→</button>
-  </div>
-
-  <div class="gallery-dots" id="gallery-dots"></div>
 </section>
 
 <!-- FAB GROUP -->
@@ -2023,88 +2173,130 @@ window.onload = () => {
 // ═══════════════════════════════════════
 //  GALLERY
 // ═══════════════════════════════════════
+// ═══════════════════════════════════════
+//  GALLERY: SNAKE & POLAROID
+// ═══════════════════════════════════════
+const UPLOADER_COLORS = {};
+const COLOR_PALETTE = ['#f472b6', '#f0c060', '#ff7e67', '#c084fc', '#4ade80', '#60a5fa', '#fbbf24', '#f87171'];
+let paletteIdx = 0;
+
+function getUploaderColor(name) {
+  if (!UPLOADER_COLORS[name]) {
+    UPLOADER_COLORS[name] = COLOR_PALETTE[paletteIdx % COLOR_PALETTE.length];
+    paletteIdx++;
+  }
+  return UPLOADER_COLORS[name];
+}
+
 function renderGallery() {
   const track = document.getElementById('gallery-track');
-  const dotsContainer = document.getElementById('gallery-dots');
+  const uploaderKey = document.getElementById('uploader-key');
   track.innerHTML = '';
-  dotsContainer.innerHTML = '';
-
+  uploaderKey.innerHTML = '';
+  
+  // Reset for keys
+  const uniqueUploaders = new Set();
+  
   SAMPLE_CARDS.forEach((card, i) => {
+    const color = getUploaderColor(card.uploader || 'A Friend');
+    uniqueUploaders.add(card.uploader || 'A Friend');
+    
     const el = document.createElement('div');
-    el.className = `gallery-card ${card.type === 'intro' ? 'intro-card' : ''} theme-${card.style || ''} ${i === currentCard ? 'active' : ''}`;
-    el.setAttribute('data-index', i);
-
-    if (card.type === 'intro') {
-      el.innerHTML = `
-        <div class="card-inner" style="background:${card.bg || '#222'}">
-          <div class="intro-card-bg"></div>
-          <div class="intro-card-content">
-            <div class="intro-label">✦ featuring ✦</div>
-            <div class="intro-person">${card.person || 'Everyone'}</div>
-            <div class="intro-divider"></div>
-            <div class="intro-tagline">${card.tagline || ''}</div>
-          </div>
-        </div>
-        <div class="uploader-tag">
-          <div class="uploader-avatar">${(card.uploader || 'A Friend')[0].toUpperCase()}</div>
-          <div class="uploader-info">
-            <div class="uploader-name">${card.uploader || 'A Friend'}</div>
-            <div class="uploader-role">uploaded this memory</div>
-          </div>
-        </div>
-      `;
-    } else {
-      // Build audio pill if this card has a song
-      const audioPillHtml = card.uploaderSong ? `
-        <div class="card-audio-pill" onclick="event.stopPropagation(); toggleDedication()">
-          <div class="audio-eq paused" id="eq-${i}">
-            <div class="audio-eq-bar"></div>
-            <div class="audio-eq-bar"></div>
-            <div class="audio-eq-bar"></div>
-            <div class="audio-eq-bar"></div>
-          </div>
-          <div class="audio-pill-text">
-            <div class="audio-pill-name">${card.uploader}'s pick</div>
-            <div class="audio-pill-song">${card.uploaderSongName || '♪ Dedication'}</div>
-          </div>
-        </div>
-      ` : '';
-
-      el.innerHTML = `
-        <div class="card-inner" style="background:${card.bg || '#111'}">
-          ${card.isVideo
-            ? `<video src="${card.image}" class="card-photo" loop playsinline></video>`
-            : card.image 
-              ? `<img src="${card.image}" class="card-photo" alt="Memory" />` 
-              : `<div class="card-photo-placeholder" style="background:${card.bg || '#333'}; color:${card.color || '#fff'}; font-size:5rem">${card.emoji || '✨'}</div>`
-          }
-          <div class="card-overlay">
-            ${card.person ? `<div class="card-intro-tag">memory</div><div class="card-name">${card.person}</div>` : ''}
-            <div class="card-caption">${card.text || card.caption || ''}</div>
-          </div>
-          ${audioPillHtml}
-        </div>
-        <div class="uploader-tag">
-          <div class="uploader-avatar">${(card.uploader || 'A Friend')[0].toUpperCase()}</div>
-          <div class="uploader-info">
-            <div class="uploader-name">${card.uploader || 'A Friend'}</div>
-            <div class="uploader-role">uploaded this memory</div>
-          </div>
-        </div>
-      `;
-    }
+    el.className = 'polaroid-card';
+    
+    // Zigzag Snake Logic (3 columns)
+    const row = Math.floor(i / 3);
+    const isReversed = row % 2 !== 0;
+    const colPosition = isReversed ? 2 - (i % 3) : (i % 3);
+    
+    el.style.gridColumn = colPosition + 1;
+    el.style.gridRow = row + 1;
+    
+    // Random rotation
+    const rotation = Math.random() * 16 - 8;
+    el.style.transform = `rotate(${rotation}deg)`;
+    
+    // Uploader color accent
+    el.style.borderColor = color;
+    
+    el.innerHTML = `
+      <div class="polaroid-badge" style="background:${color}">${i + 1}</div>
+      <div class="polaroid-img-container">
+        ${card.isVideo 
+          ? `<video src="${card.image}" class="polaroid-img" muted loop playsinline autoplay></video>`
+          : `<img src="${card.image || 'https://via.placeholder.com/400?text=✨'}" class="polaroid-img" alt="Memory" />`
+        }
+      </div>
+      <div class="polaroid-footer">
+        <div class="movie-credit-name" style="color:${color}">${card.uploader || 'A Friend'}</div>
+        <div class="movie-credit-caption">${card.text || card.caption || '...'}</div>
+      </div>
+    `;
 
     el.onclick = () => openCinemaMode(i);
     track.appendChild(el);
-
-    const dot = document.createElement('div');
-    dot.className = `dot ${i === currentCard ? 'active' : ''}`;
-    dot.onclick = () => goToCard(i);
-    dotsContainer.appendChild(dot);
   });
 
-  updateTrackPosition();
+  // Render Uploader Key
+  uniqueUploaders.forEach(name => {
+    const color = getUploaderColor(name);
+    const item = document.createElement('div');
+    item.className = 'key-item';
+    item.innerHTML = `<div class="key-color" style="background:${color}"></div>${name}`;
+    uploaderKey.appendChild(item);
+  });
+
+  // Draw SVG Path after a short delay to ensure layout is settled
+  setTimeout(drawSnakePath, 100);
 }
+
+function drawSnakePath() {
+  const track = document.getElementById('gallery-track');
+  const path = document.getElementById('gallery-path-line');
+  const cards = track.querySelectorAll('.polaroid-card');
+  if (cards.length < 2) return;
+
+  const trackRect = track.getBoundingClientRect();
+  let d = '';
+
+  cards.forEach((card, i) => {
+    const rect = card.getBoundingClientRect();
+    const cx = (rect.left + rect.width / 2) - trackRect.left;
+    const cy = (rect.top + rect.height / 2) - trackRect.top;
+
+    if (i === 0) {
+      d += `M ${cx} ${cy}`;
+    } else {
+      const prevRect = cards[i-1].getBoundingClientRect();
+      const pcx = (prevRect.left + prevRect.width / 2) - trackRect.left;
+      const pcy = (prevRect.top + prevRect.height / 2) - trackRect.top;
+      
+      // Control points for organic curves
+      const cp1x = pcx;
+      const cp1y = pcy + (cy - pcy) / 2;
+      const cp2x = cx;
+      const cp2y = cy - (cy - pcy) / 2;
+      
+      d += ` C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${cx} ${cy}`;
+    }
+  });
+
+  path.setAttribute('d', d);
+}
+
+// Redefine goToCard to primarily handle state; scrolling is handled by browser
+function goToCard(i) {
+  currentCard = Math.max(0, Math.min(i, SAMPLE_CARDS.length - 1));
+  sessionStorage.setItem('ritah-gallery-card', currentCard.toString());
+  
+  // If Cinema Mode is open, update its content
+  if (isCinemaOpen) {
+    updateCinemaContent();
+  }
+}
+
+// Ensure path redraws on resize
+window.addEventListener('resize', drawSnakePath);
 
 // ── Per-Uploader Dedication Audio ──
 function getUploaderCardCount(uploaderName) {
@@ -2186,15 +2378,13 @@ function toggleDedication() {
   }
 }
 
+// Redefine goToCard to primarily handle state; scrolling is handled by browser
 function goToCard(i) {
   currentCard = Math.max(0, Math.min(i, SAMPLE_CARDS.length - 1));
-  sessionStorage.setItem('rita-gallery-card', currentCard.toString());
-  updateTrackPosition();
-  updateDots();
-  updateCardClasses();
-
+  sessionStorage.setItem('ritah-gallery-card', currentCard.toString());
+  
   const currentItem = SAMPLE_CARDS[currentCard];
-  const allVideos = document.querySelectorAll('video');
+  const allVideos = document.querySelectorAll('.polaroid-img-container video');
   allVideos.forEach(v => v.pause());
 
   // ── Per-uploader dedication song logic ──
@@ -2203,16 +2393,13 @@ function goToCard(i) {
   const newSongName = currentItem ? currentItem.uploaderSongName : null;
 
   if (newSong && newUploader !== currentDedicationUploader) {
-    // Switched to a different uploader who has a song — play their dedication
     if (bgMusic && !bgMusic.paused) { musicWasPlaying = true; bgMusic.pause(); }
     playDedication(newSong, newUploader, newSongName);
   } else if (newSong && newUploader === currentDedicationUploader) {
-    // Same uploader, song already playing — update the EQ indicator
     document.querySelectorAll('.audio-eq').forEach(eq => eq.classList.add('paused'));
     const activeEq = document.getElementById('eq-' + currentCard);
     if (activeEq && dedicationAudio && !dedicationAudio.paused) activeEq.classList.remove('paused');
   } else if (!newSong && currentDedicationUploader) {
-    // Moved to a card without a song — stop dedication
     stopDedication();
     if (musicWasPlaying && bgMusic) {
       bgMusic.play().catch(e => console.log(e));
@@ -2220,21 +2407,9 @@ function goToCard(i) {
     }
   }
 
-  // Handle video auto-play & sync with audio
-  if (currentItem && currentItem.isVideo) {
-    const activeVideo = document.querySelector(`.gallery-card[data-index="${currentCard}"] video`);
-    if (activeVideo) {
-      // Mute video if dedication song is playing, otherwise unmute it
-      activeVideo.muted = (dedicationAudio && !dedicationAudio.paused);
-      activeVideo.play().catch(e => console.log(e));
-    }
-
-    if (!dedicationAudio || dedicationAudio.paused) {
-      if (bgMusic && !bgMusic.paused) {
-        musicWasPlaying = true;
-        bgMusic.pause();
-      }
-    }
+  // If Cinema Mode is open, update its content
+  if (isCinemaOpen) {
+    updateCinemaContent();
   }
 }
 
