@@ -285,10 +285,8 @@
   #gallery {
     padding: 80px 0 100px;
     position: relative;
-    width: 95%;
-    max-width: 1300px; /* Widened to fill the screen */
-    margin-left: 2% !important; /* Force shift towards the left */
-    margin-right: auto !important;
+    width: 100%;
+    margin: 0 auto;
     overflow: visible;
   }
 
@@ -303,10 +301,10 @@
     display: grid !important;
     grid-template-columns: repeat(3, 1fr) !important;
     gap: 60px 0;
-    justify-items: center; 
+    justify-items: center;
     position: relative;
     z-index: 5;
-    padding: 40px 180px 40px 0; /* Massive right padding to protect FAB labels */
+    padding: 40px 20px;
     width: 100%;
     box-sizing: border-box;
   }
@@ -463,15 +461,34 @@
     border-radius: 50%;
   }
 
-  @media (max-width: 600px) {
+  /* Tablet: 2-column layout */
+  @media (max-width: 1024px) {
+    #gallery {
+      margin-left: 2% !important;
+      margin-right: 2% !important;
+    }
+    .gallery-track {
+      grid-template-columns: repeat(2, 1fr) !important;
+      padding: 30px 10px;
+    }
+    .polaroid-card { width: 200px; }
+  }
+
+  /* Mobile: 1-column centered */
+  @media (max-width: 768px) {
+    #gallery {
+      margin-left: 0 !important;
+      margin-right: 0 !important;
+      width: 100% !important;
+    }
     .gallery-track {
       grid-template-columns: repeat(1, 1fr) !important;
       gap: 40px;
-      padding: 20px 20px; /* Simple centered padding for mobile */
+      padding: 20px 10px;
     }
     .polaroid-card { 
-      width: 90%; /* Fits all phone screens */
-      max-width: 320px;
+      width: 85%;
+      max-width: 300px;
       padding-bottom: 30px; 
     }
     .movie-credit-name { font-size: 0.9rem; }
