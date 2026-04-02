@@ -1679,17 +1679,45 @@ window.onload = () => {
     document.getElementById('song-play-btn').textContent = '▶';
   });
 
-  // Cinematic intro
-  setTimeout(() => {
-    document.getElementById('cinematic-intro').classList.add('fade-out');
+  // ── SCROLL PERSISTENCE ──
+  const hasVisited = sessionStorage.getItem('rita-visited');
+  const savedScroll = sessionStorage.getItem('rita-scroll-y');
+  const savedCard = sessionStorage.getItem('rita-gallery-card');
+
+  if (hasVisited) {
+    // Skip cinematic intro on reload — user has already seen it this session
+    document.getElementById('cinematic-intro').style.display = 'none';
+    if (savedCard) currentCard = parseInt(savedCard, 10);
+  } else {
+    // First visit this session — show cinematic intro
+    sessionStorage.setItem('rita-visited', 'true');
     setTimeout(() => {
-      document.getElementById('cinematic-intro').style.display = 'none';
-      launchConfetti();
-    }, 1000);
-  }, 3000);
+      document.getElementById('cinematic-intro').classList.add('fade-out');
+      setTimeout(() => {
+        document.getElementById('cinematic-intro').style.display = 'none';
+        launchConfetti();
+      }, 1000);
+    }, 3000);
+  }
 
   renderGallery();
   setupDrag();
+
+  // Restore scroll position after a short delay (DOM needs to render)
+  if (hasVisited && savedScroll) {
+    requestAnimationFrame(() => {
+      window.scrollTo(0, parseInt(savedScroll, 10));
+    });
+  }
+
+  // Save scroll position as user scrolls
+  let scrollSaveTimeout;
+  window.addEventListener('scroll', () => {
+    clearTimeout(scrollSaveTimeout);
+    scrollSaveTimeout = setTimeout(() => {
+      sessionStorage.setItem('rita-scroll-y', window.scrollY.toString());
+    }, 200);
+  }, { passive: true });
 };
 
 // ═══════════════════════════════════════
@@ -1763,6 +1791,7 @@ function renderGallery() {
 
 function goToCard(i) {
   currentCard = Math.max(0, Math.min(i, SAMPLE_CARDS.length - 1));
+  sessionStorage.setItem('rita-gallery-card', currentCard.toString());
   updateTrackPosition();
   updateDots();
   updateCardClasses();

@@ -1,0 +1,9 @@
+# Force Nixpacks to treat this as a Node.js project
+[phases.setup]
+nixPkgs = ["nodejs_18"]
+
+[phases.install]
+cmds = ["npm install"]
+
+[start]
+cmd = "node server.js"
