@@ -1066,6 +1066,112 @@
     100% { opacity: 1; letter-spacing: 6px; }
   }
 
+  /* ── IG-STYLE AUDIO INDICATOR ── */
+  .card-audio-pill {
+    position: absolute;
+    bottom: 70px; left: 12px;
+    display: flex; align-items: center; gap: 8px;
+    background: rgba(0,0,0,0.65);
+    backdrop-filter: blur(8px);
+    border-radius: 20px;
+    padding: 6px 14px 6px 10px;
+    z-index: 20;
+    cursor: pointer;
+    transition: all 0.3s;
+    max-width: 200px;
+    opacity: 0;
+    transform: translateY(10px);
+    animation: fadeUp 0.4s 0.3s forwards;
+  }
+
+  .card-audio-pill:hover {
+    background: rgba(0,0,0,0.8);
+    transform: scale(1.05);
+  }
+
+  .audio-eq {
+    display: flex; align-items: flex-end; gap: 2px;
+    height: 14px; width: 16px;
+  }
+
+  .audio-eq-bar {
+    width: 3px;
+    background: var(--gold);
+    border-radius: 1px;
+    animation: eqBounce 0.8s ease-in-out infinite;
+  }
+
+  .audio-eq-bar:nth-child(1) { height: 6px; animation-delay: 0s; }
+  .audio-eq-bar:nth-child(2) { height: 10px; animation-delay: 0.15s; }
+  .audio-eq-bar:nth-child(3) { height: 4px; animation-delay: 0.3s; }
+  .audio-eq-bar:nth-child(4) { height: 8px; animation-delay: 0.1s; }
+
+  .audio-eq.paused .audio-eq-bar {
+    animation: none;
+    height: 3px !important;
+  }
+
+  @keyframes eqBounce {
+    0%, 100% { height: 4px; }
+    50% { height: 14px; }
+  }
+
+  .audio-pill-text {
+    font-size: 0.7rem;
+    color: #fff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 130px;
+    line-height: 1.2;
+  }
+
+  .audio-pill-name {
+    font-weight: 500;
+  }
+
+  .audio-pill-song {
+    font-size: 0.6rem;
+    color: rgba(255,255,255,0.6);
+  }
+
+  /* Song upload confirmation in modal */
+  .song-selected {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 14px;
+    background: rgba(240,192,96,0.1);
+    border: 1px solid rgba(240,192,96,0.3);
+    border-radius: 12px;
+    margin-top: 8px;
+  }
+
+  .song-selected-icon {
+    font-size: 1.3rem;
+    flex-shrink: 0;
+  }
+
+  .song-selected-info {
+    flex: 1; min-width: 0;
+  }
+
+  .song-selected-name {
+    font-size: 0.8rem; font-weight: 500; color: var(--gold);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+
+  .song-selected-hint {
+    font-size: 0.65rem; color: rgba(255,255,255,0.4);
+  }
+
+  .song-selected-remove {
+    background: none; border: none;
+    color: rgba(255,255,255,0.4);
+    cursor: pointer; font-size: 1.1rem;
+    padding: 4px;
+  }
+
+  .song-selected-remove:hover { color: var(--rose); }
+
   /* ── SONG BAR ── */
   .song-bar {
     position: fixed; bottom: 0; left: 0; right: 0;
@@ -1418,12 +1524,13 @@
     </div>
 
     <div class="form-group">
-      <label class="form-label">Upload Your Song (optional)</label>
-      <div class="upload-zone" style="padding:20px" onclick="document.getElementById('song-input').click()">
-        <div class="upload-icon" style="font-size:1.5rem">🎵</div>
-        <p style="font-size:0.8rem">MP3 or audio file — becomes your moment's soundtrack</p>
+      <label class="form-label">🎵 Your Dedication Song (optional)</label>
+      <div class="upload-zone" style="padding:20px" id="song-zone" onclick="document.getElementById('song-input').click()">
+        <div class="upload-icon" style="font-size:1.5rem">🎶</div>
+        <p style="font-size:0.8rem">Pick a song that reminds you of Rita — it'll play with your memories</p>
         <input type="file" id="song-input" accept="audio/*" style="display:none" onchange="handleSongUpload(event)">
       </div>
+      <div id="song-selected-display" style="display:none"></div>
     </div>
 
     <div class="form-group">
@@ -1564,11 +1671,17 @@ let isPlaying = false;
 let songProgress = 0;
 let songInterval = null;
 let currentSongName = null;
+let uploadSongFile = null; // Track the song file for upload
 
 const STYLES = ['polaroid','vhs','neon','gold','watercolor','flower','sidecap','filmstrip'];
 
 let SAMPLE_CARDS = [];
 let uploadFiles = []; // Track files selected in upload modal
+
+// ── Dedication Audio System ──
+let dedicationAudio = null; // The Audio element for dedications
+let currentDedicationUploader = null; // Who's song is currently loaded
+let dedicationTimeout = null; // Timer for 30s max on single-photo
 
 // Backend URL — update to your Railway deployment URL in production
 const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
@@ -1754,6 +1867,22 @@ function renderGallery() {
         </div>
       `;
     } else {
+      // Build audio pill if this card has a song
+      const audioPillHtml = card.uploaderSong ? `
+        <div class="card-audio-pill" onclick="event.stopPropagation(); toggleDedication()">
+          <div class="audio-eq paused" id="eq-${i}">
+            <div class="audio-eq-bar"></div>
+            <div class="audio-eq-bar"></div>
+            <div class="audio-eq-bar"></div>
+            <div class="audio-eq-bar"></div>
+          </div>
+          <div class="audio-pill-text">
+            <div class="audio-pill-name">${card.uploader}'s pick</div>
+            <div class="audio-pill-song">${card.uploaderSongName || '♪ Dedication'}</div>
+          </div>
+        </div>
+      ` : '';
+
       el.innerHTML = `
         <div class="card-inner" style="background:${card.bg || '#111'}">
           ${card.isVideo
@@ -1766,6 +1895,7 @@ function renderGallery() {
             ${card.person ? `<div class="card-intro-tag">memory</div><div class="card-name">${card.person}</div>` : ''}
             <div class="card-caption">${card.text || card.caption || ''}</div>
           </div>
+          ${audioPillHtml}
         </div>
         <div class="uploader-tag">
           <div class="uploader-avatar">${(card.uploader || 'A Friend')[0].toUpperCase()}</div>
@@ -1789,6 +1919,86 @@ function renderGallery() {
   updateTrackPosition();
 }
 
+// ── Per-Uploader Dedication Audio ──
+function getUploaderCardCount(uploaderName) {
+  return SAMPLE_CARDS.filter(c => c.uploader === uploaderName).length;
+}
+
+function playDedication(songUrl, uploaderName, songName) {
+  // Stop old audio
+  if (dedicationAudio) {
+    dedicationAudio.pause();
+    dedicationAudio.src = '';
+  }
+  clearTimeout(dedicationTimeout);
+
+  dedicationAudio = new Audio(songUrl);
+  dedicationAudio.volume = 0.7;
+  currentDedicationUploader = uploaderName;
+
+  // Update song bar
+  const bar = document.getElementById('song-bar');
+  document.getElementById('song-title-bar').textContent = songName || 'Dedication';
+  document.getElementById('song-artist-bar').textContent = `🎵 ${uploaderName}'s dedication`;
+  bar.classList.add('visible');
+
+  dedicationAudio.addEventListener('timeupdate', () => {
+    const progress = (dedicationAudio.currentTime / dedicationAudio.duration) * 100 || 0;
+    document.getElementById('song-progress-fill').style.width = progress + '%';
+  });
+
+  dedicationAudio.addEventListener('play', () => {
+    isPlaying = true;
+    document.getElementById('song-play-btn').textContent = '⏸';
+    // Animate all eq bars for this uploader's cards
+    document.querySelectorAll('.audio-eq').forEach(eq => {
+      eq.classList.add('paused');
+    });
+    const activeEq = document.getElementById('eq-' + currentCard);
+    if (activeEq) activeEq.classList.remove('paused');
+  });
+
+  dedicationAudio.addEventListener('pause', () => {
+    isPlaying = false;
+    document.getElementById('song-play-btn').textContent = '▶';
+    document.querySelectorAll('.audio-eq').forEach(eq => eq.classList.add('paused'));
+  });
+
+  dedicationAudio.play().catch(e => console.log('Audio autoplay blocked:', e));
+
+  // If single photo memory, limit to 30 seconds
+  const cardCount = getUploaderCardCount(uploaderName);
+  if (cardCount <= 2) { // 1 intro + 1 photo = single photo memory
+    dedicationTimeout = setTimeout(() => {
+      if (dedicationAudio) {
+        dedicationAudio.pause();
+        showToast('🎵 Dedication ended');
+      }
+    }, 30000);
+  }
+}
+
+function stopDedication() {
+  if (dedicationAudio) {
+    dedicationAudio.pause();
+    dedicationAudio.src = '';
+    dedicationAudio = null;
+  }
+  clearTimeout(dedicationTimeout);
+  currentDedicationUploader = null;
+  document.getElementById('song-bar').classList.remove('visible');
+  document.querySelectorAll('.audio-eq').forEach(eq => eq.classList.add('paused'));
+}
+
+function toggleDedication() {
+  if (!dedicationAudio) return;
+  if (dedicationAudio.paused) {
+    dedicationAudio.play().catch(e => console.log(e));
+  } else {
+    dedicationAudio.pause();
+  }
+}
+
 function goToCard(i) {
   currentCard = Math.max(0, Math.min(i, SAMPLE_CARDS.length - 1));
   sessionStorage.setItem('rita-gallery-card', currentCard.toString());
@@ -1796,23 +2006,43 @@ function goToCard(i) {
   updateDots();
   updateCardClasses();
 
-  // Handle Video auto-play/pause and background music
   const currentItem = SAMPLE_CARDS[currentCard];
   const allVideos = document.querySelectorAll('video');
   allVideos.forEach(v => v.pause());
 
+  // ── Per-uploader dedication song logic ──
+  const newUploader = currentItem ? currentItem.uploader : null;
+  const newSong = currentItem ? currentItem.uploaderSong : null;
+  const newSongName = currentItem ? currentItem.uploaderSongName : null;
+
+  if (newSong && newUploader !== currentDedicationUploader) {
+    // Switched to a different uploader who has a song — play their dedication
+    if (bgMusic && !bgMusic.paused) { musicWasPlaying = true; bgMusic.pause(); }
+    playDedication(newSong, newUploader, newSongName);
+  } else if (newSong && newUploader === currentDedicationUploader) {
+    // Same uploader, song already playing — update the EQ indicator
+    document.querySelectorAll('.audio-eq').forEach(eq => eq.classList.add('paused'));
+    const activeEq = document.getElementById('eq-' + currentCard);
+    if (activeEq && dedicationAudio && !dedicationAudio.paused) activeEq.classList.remove('paused');
+  } else if (!newSong && currentDedicationUploader) {
+    // Moved to a card without a song — stop dedication
+    stopDedication();
+    if (musicWasPlaying && bgMusic) {
+      bgMusic.play().catch(e => console.log(e));
+      musicWasPlaying = false;
+    }
+  }
+
+  // Handle video auto-play
   if (currentItem && currentItem.isVideo) {
-    if (bgMusic && !bgMusic.paused) {
+    if (dedicationAudio && !dedicationAudio.paused) {
+      // Let the dedication keep playing over video
+    } else if (bgMusic && !bgMusic.paused) {
       musicWasPlaying = true;
       bgMusic.pause();
     }
     const activeVideo = document.querySelector(`.gallery-card[data-index="${currentCard}"] video`);
     if (activeVideo) activeVideo.play().catch(e => console.log(e));
-  } else {
-    if (musicWasPlaying && bgMusic) {
-      bgMusic.play().catch(e => console.log(e));
-      musicWasPlaying = false;
-    }
   }
 }
 
@@ -1934,11 +2164,33 @@ function handleFileUpload(e) {
 function handleSongUpload(e) {
   const file = e.target.files[0];
   if (!file) return;
+  uploadSongFile = file;
   currentSongName = file.name.replace(/\.[^.]+$/, '');
-  const bar = document.getElementById('song-bar');
-  document.getElementById('song-title-bar').textContent = currentSongName;
-  bar.classList.add('visible');
-  showToast('🎵 Song added — will play with your gallery!');
+  
+  // Show confirmation in the modal
+  const display = document.getElementById('song-selected-display');
+  display.style.display = 'block';
+  display.innerHTML = `
+    <div class="song-selected">
+      <div class="song-selected-icon">🎵</div>
+      <div class="song-selected-info">
+        <div class="song-selected-name">${currentSongName}</div>
+        <div class="song-selected-hint">Will play with your memories</div>
+      </div>
+      <button class="song-selected-remove" onclick="removeSongSelection()" title="Remove">✕</button>
+    </div>
+  `;
+  
+  // Hide the upload zone since we have a song
+  document.getElementById('song-zone').style.display = 'none';
+}
+
+function removeSongSelection() {
+  uploadSongFile = null;
+  currentSongName = null;
+  document.getElementById('song-selected-display').style.display = 'none';
+  document.getElementById('song-zone').style.display = '';
+  document.getElementById('song-input').value = '';
 }
 
 async function submitUpload() {
@@ -1963,15 +2215,33 @@ async function submitUpload() {
     filmstrip: 'linear-gradient(135deg, #111 0%, #222 100%)'
   };
 
+  const submitBtn = document.querySelector('#upload-modal .btn-full-gold');
+  const origText = submitBtn.textContent;
+  submitBtn.textContent = '⏳ Uploading...';
+  submitBtn.disabled = true;
+
   let imageUrls = [];
+  let songUrl = null;
+  let songName = currentSongName || null;
 
-  // If files were selected, upload to Cloudinary via backend
+  // Upload song first (if selected)
+  if (uploadSongFile) {
+    try {
+      const songForm = new FormData();
+      songForm.append('song', uploadSongFile);
+      const songResp = await fetch(API_URL + '/api/upload-song', { method: 'POST', body: songForm });
+      const songData = await songResp.json();
+      if (songData.success) {
+        songUrl = songData.url;
+      }
+    } catch (err) {
+      console.error('Song upload error:', err);
+      // Non-fatal — continue without song
+    }
+  }
+
+  // Upload images/videos
   if (uploadFiles.length > 0) {
-    const submitBtn = document.querySelector('#upload-modal .btn-full-gold');
-    const origText = submitBtn.textContent;
-    submitBtn.textContent = '⏳ Uploading...';
-    submitBtn.disabled = true;
-
     try {
       const formData = new FormData();
       uploadFiles.forEach(f => formData.append('files', f));
@@ -1997,16 +2267,18 @@ async function submitUpload() {
       submitBtn.disabled = false;
       return;
     }
-
-    submitBtn.textContent = origText;
-    submitBtn.disabled = false;
   }
 
-  // Add intro card
+  submitBtn.textContent = origText;
+  submitBtn.disabled = false;
+
+  // Add intro card (with song info)
   const introCard = {
     type: 'intro', person: name, uploader: name,
     tagline: `"A memory lovingly shared just for Rita..."`,
-    bg: 'linear-gradient(135deg, #1a0a0f 0%, #2d1520 100%)'
+    bg: 'linear-gradient(135deg, #1a0a0f 0%, #2d1520 100%)',
+    uploaderSong: songUrl || null,
+    uploaderSongName: songName || null
   };
   SAMPLE_CARDS.push(introCard);
   db.ref("gallery").push(introCard);
@@ -2017,7 +2289,9 @@ async function submitUpload() {
       const photoCard = {
         type: 'photo', style, image: f.url, isVideo: f.isVideo,
         person: `From ${name}`, caption, uploader: name,
-        emoji: emojis[style] || '📸', bg: bgs[style] || bgs.gold, color: '#fff'
+        emoji: emojis[style] || '📸', bg: bgs[style] || bgs.gold, color: '#fff',
+        uploaderSong: songUrl || null,
+        uploaderSongName: songName || null
       };
       SAMPLE_CARDS.push(photoCard);
       db.ref("gallery").push(photoCard);
@@ -2026,7 +2300,9 @@ async function submitUpload() {
     const photoCard = {
       type: 'photo', style, uploader: name,
       emoji: emojis[style] || '📸', bg: bgs[style] || bgs.gold,
-      person: `From ${name}`, caption, color: '#fff'
+      person: `From ${name}`, caption, color: '#fff',
+      uploaderSong: songUrl || null,
+      uploaderSongName: songName || null
     };
     SAMPLE_CARDS.push(photoCard);
     db.ref("gallery").push(photoCard);
@@ -2035,11 +2311,13 @@ async function submitUpload() {
   renderGallery();
   goToCard(SAMPLE_CARDS.length - 1);
   closeModal('upload-modal');
-  showToast('🎬 Your memory was added to the gallery!');
+  showToast(songUrl ? '🎬🎵 Memory + dedication added!' : '🎬 Your memory was added to the gallery!');
   launchConfetti();
 
   // Reset form
   uploadFiles = [];
+  uploadSongFile = null;
+  currentSongName = null;
   document.getElementById('uploader-name').value = '';
   document.getElementById('uploader-caption').value = '';
   document.getElementById('upload-zone').innerHTML = `
@@ -2047,6 +2325,10 @@ async function submitUpload() {
     <p>Drag & drop photos or videos<br><span>or click to browse</span></p>
     <input type="file" id="file-input" multiple accept="image/*,video/*" style="display:none" onchange="handleFileUpload(event)">
   `;
+  // Reset song selection
+  document.getElementById('song-selected-display').style.display = 'none';
+  document.getElementById('song-zone').style.display = '';
+  document.getElementById('song-input').value = '';
   // Reset preview
   document.getElementById('preview-placeholder').style.display = 'flex';
   const existImg = document.querySelector('#preview-inner .preview-img');
@@ -2130,6 +2412,11 @@ function copyLink() {
 //  SONG PLAYER
 // ═══════════════════════════════════════
 function togglePlay() {
+  // Prioritize dedication audio if it exists
+  if (dedicationAudio) {
+    toggleDedication();
+    return;
+  }
   if (!bgMusic) return;
   if (bgMusic.paused) {
     bgMusic.play().catch(e => console.log(e));
@@ -2139,11 +2426,12 @@ function togglePlay() {
 }
 
 function seekSong(e) {
-  if (!bgMusic || !bgMusic.duration) return;
+  const audio = dedicationAudio || bgMusic;
+  if (!audio || !audio.duration) return;
   const bar = e.currentTarget;
   const rect = bar.getBoundingClientRect();
   const percent = (e.clientX - rect.left) / rect.width;
-  bgMusic.currentTime = percent * bgMusic.duration;
+  audio.currentTime = percent * audio.duration;
 }
 
 // ═══════════════════════════════════════
